@@ -318,10 +318,34 @@ function Contact() {
 
   const handle = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-  const submit = (e) => {
-    e.preventDefault();
-    setSubmitted(true);
-  };
+const submit = (e) => {
+  e.preventDefault();
+
+  const branchName =
+    branches.find((b) => b.id === form.branch)?.label || form.branch;
+
+  const message = `Hello EngiAssist!
+
+New Project Help Request
+
+Name: ${form.name}
+Email: ${form.email}
+Branch: ${branchName}
+Semester: ${form.semester || "Not specified"}
+Project: ${form.project || "Not specified"}
+
+Message:
+${form.message || "No message provided"}
+
+Please contact me regarding my project.`;
+
+  const whatsappUrl =
+    `https://wa.me/919021698707?text=${encodeURIComponent(message)}`;
+
+  window.open(whatsappUrl, "_blank");
+
+  setSubmitted(true);
+};
 
   return (
     <section className="contact-section" id="contact">
@@ -410,6 +434,14 @@ function Footer() {
 
 export default function App() {
   const [active, setActive] = useState("Home");
+
+  const openWhatsApp = () => {
+    const message = "Hello EngiAssist! I need help with my engineering project.";
+    const whatsappUrl = `https://wa.me/919021698707?text=${encodeURIComponent(message)}`;
+
+    window.open(whatsappUrl, "_blank");
+  };
+
   return (
     <div className="app">
       <Navbar active={active} setActive={setActive} />
@@ -419,6 +451,49 @@ export default function App() {
       <Projects />
       <Contact />
       <Footer />
+
+      {/* Floating WhatsApp Button */}
+      <button
+        onClick={openWhatsApp}
+        aria-label="Chat with us on WhatsApp"
+        title="Chat with us on WhatsApp"
+        style={{
+          position: "fixed",
+          right: "24px",
+          bottom: "24px",
+          width: "60px",
+          height: "60px",
+          borderRadius: "50%",
+          border: "none",
+          background: "#25D366",
+          color: "white",
+          fontSize: "30px",
+          cursor: "pointer",
+          zIndex: 9999,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          boxShadow: "0 6px 20px rgba(0, 0, 0, 0.3)",
+          transition: "transform 0.2s ease",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = "scale(1.1)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = "scale(1)";
+        }}
+      >
+        <svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+  width="32"
+  height="32"
+  fill="white"
+  aria-hidden="true"
+>
+  <path d="M20.52 3.449A11.86 11.86 0 0 0 12.05 0C5.495 0 .163 5.332.163 11.89c0 2.096.548 4.142 1.588 5.946L0 24l6.335-1.655a11.88 11.88 0 0 0 5.709 1.447h.005c6.554 0 11.887-5.332 11.887-11.89a11.85 11.85 0 0 0-3.416-8.453zM12.05 21.79h-.004a9.87 9.87 0 0 1-5.032-1.378l-.361-.214-3.76.982 1.004-3.67-.235-.375a9.87 9.87 0 0 1-1.51-5.245c0-5.442 4.43-9.872 9.877-9.872a9.83 9.83 0 0 1 6.994 2.9 9.83 9.83 0 0 1 2.894 6.994c-.003 5.445-4.433 9.878-9.867 9.878zm5.413-7.397c-.297-.149-1.758-.867-2.03-.967-.273-.099-.472-.148-.67.149-.198.297-.767.966-.94 1.164-.173.198-.347.223-.644.075-.297-.149-1.256-.463-2.39-1.475-.883-.788-1.48-1.762-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.173.198-.298.298-.496.099-.198.05-.372-.025-.521-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.501-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.075-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
+</svg>
+      </button>
     </div>
   );
 }
