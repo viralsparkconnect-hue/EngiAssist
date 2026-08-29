@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import "./index.css";
+import { supabase } from "./lib/supabaseClient";
+import Dashboard from "./Dashboard";
 
 const branches = [
   {
@@ -315,16 +317,36 @@ function Projects() {
 function Contact() {
   const [form, setForm] = useState({ name: "", email: "", branch: "cs", semester: "", project: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const handle = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-const submit = (e) => {
-  e.preventDefault();
+  const submit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
 
-  const branchName =
-    branches.find((b) => b.id === form.branch)?.label || form.branch;
+    const branchName =
+      branches.find((b) => b.id === form.branch)?.label || form.branch;
 
-  const message = `Hello EngiAssist!
+    // Save the lead so it shows up in /dashboard — if this fails (e.g. offline),
+    // we still let the student reach us on WhatsApp below.
+    try {
+      const { error: insertError } = await supabase.from("leads").insert([
+        {
+          name: form.name,
+          email: form.email,
+          branch: form.branch,
+          semester: form.semester,
+          project: form.project,
+          message: form.message,
+        },
+      ]);
+      if (insertError) console.error("Lead save failed:", insertError.message);
+    } catch (err) {
+      console.error("Lead save failed:", err);
+    }
+
+    const message = `Hello EngiAssist!
 
 New Project Help Request
 
@@ -339,13 +361,14 @@ ${form.message || "No message provided"}
 
 Please contact me regarding my project.`;
 
-  const whatsappUrl =
-    `https://wa.me/919021698707?text=${encodeURIComponent(message)}`;
+    const whatsappUrl =
+      `https://wa.me/919021698707?text=${encodeURIComponent(message)}`;
 
-  window.open(whatsappUrl, "_blank");
+    window.open(whatsappUrl, "_blank");
 
-  setSubmitted(true);
-};
+    setSubmitting(false);
+    setSubmitted(true);
+  };
 
   return (
     <section className="contact-section" id="contact">
@@ -393,8 +416,8 @@ Please contact me regarding my project.`;
             </div>
             <input name="project" placeholder="Project Name / Topic (if you have one)" value={form.project} onChange={handle} />
             <textarea name="message" placeholder="Describe what help you need (project type, deadline, specific requirements...)" rows={4} value={form.message} onChange={handle}></textarea>
-            <button type="submit" className="btn-submit">
-              Submit Request 🚀
+            <button type="submit" className="btn-submit" disabled={submitting}>
+              {submitting ? "Submitting..." : "Submit Request 🚀"}
             </button>
           </form>
         ) : (
@@ -427,12 +450,13 @@ function Footer() {
           <a href="#contact">Contact</a>
         </div>
         <p className="footer-copy">© 2026 EngiAssist. Built for engineering students. 🇮🇳</p>
+        <a className="footer-admin-link" href="/dashboard">Admin Login</a>
       </div>
     </footer>
   );
 }
 
-export default function App() {
+function Landing() {
   const [active, setActive] = useState("Home");
 
   const openWhatsApp = () => {
@@ -496,4 +520,12 @@ export default function App() {
       </button>
     </div>
   );
+}
+
+export default function App() {
+  // Lightweight path-based routing — no router library needed for two pages.
+  const isDashboard =
+    typeof window !== "undefined" &&
+    window.location.pathname.replace(/\/+$/, "") === "/dashboard";
+  return isDashboard ? <Dashboard /> : <Landing />;
 }
