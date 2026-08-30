@@ -80,7 +80,7 @@ function Navbar({ active, setActive }) {
     return () => window.removeEventListener("scroll", fn);
   }, []);
 
-  const links = ["Home", "Branches", "Services", "Projects", "Contact"];
+  const links = ["Home", "Branches", "Services", "About", "Projects", "Contact"];
 
   return (
     <nav className={`navbar ${scrolled ? "scrolled" : ""}`}>
@@ -272,6 +272,62 @@ function Services() {
   );
 }
 
+function AboutUs() {
+  return (
+    <section className="about-section" id="about">
+      <div className="section-header">
+        <span className="section-tag">Who We Are</span>
+        <h2>Meet the Founder</h2>
+        <p>Built by an engineer, for engineers</p>
+      </div>
+
+      <div className="about-wrapper">
+        <div className="founder-card">
+          <div className="founder-glow"></div>
+          <div className="founder-avatar">
+            <span>PP</span>
+          </div>
+          <h3 className="founder-name">Pratik Patil</h3>
+          <p className="founder-role">CEO &amp; Founder, EngiAssist</p>
+
+          <div className="founder-badges">
+            <span className="founder-badge">⚙️ Mechanical Engineer</span>
+            <span className="founder-badge">📈 Marketing Manager @ Top Company</span>
+            <span className="founder-badge">📍 Jalgaon, Maharashtra</span>
+          </div>
+
+          <p className="founder-bio">
+            Pratik founded EngiAssist to give engineering students across every
+            branch the same project guidance and support he wished he'd had —
+            combining hands-on mechanical engineering expertise with real-world
+            marketing and leadership experience at a top company. Based in
+            Jalgaon, Maharashtra, he's built EngiAssist into a trusted resource
+            for thousands of students working on mini and major projects.
+          </p>
+        </div>
+
+        <div className="about-highlights">
+          <div className="about-highlight-card">
+            <div className="about-highlight-icon">🎓</div>
+            <h4>Engineer-Led</h4>
+            <p>Every project reviewed with real engineering rigor, not just templates.</p>
+          </div>
+          <div className="about-highlight-card">
+            <div className="about-highlight-icon">📣</div>
+            <h4>Marketing-Backed</h4>
+            <p>Presentation and communication polish from real industry marketing experience.</p>
+          </div>
+          <div className="about-highlight-card">
+            <div className="about-highlight-icon">🇮🇳</div>
+            <h4>Proudly Local</h4>
+            <p>Based in Jalgaon, Maharashtra — supporting students across India.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function Projects() {
   const [selectedBranch, setSelectedBranch] = useState("cs");
   const current = branches.find((b) => b.id === selectedBranch);
@@ -446,6 +502,7 @@ function Footer() {
           <a href="#home">Home</a>
           <a href="#branches">Branches</a>
           <a href="#services">Services</a>
+          <a href="#about">About</a>
           <a href="#projects">Projects</a>
           <a href="#contact">Contact</a>
         </div>
@@ -472,6 +529,7 @@ function Landing() {
       <Hero />
       <Branches />
       <Services />
+      <AboutUs />
       <Projects />
       <Contact />
       <Footer />
