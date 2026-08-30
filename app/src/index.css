@@ -801,6 +801,12 @@ section { padding: 6rem 5%; }
   box-shadow: 0 0 50px rgba(0,245,255,0.4);
 }
 
+.btn-submit:disabled {
+  opacity: 0.65;
+  cursor: default;
+  transform: none;
+}
+
 .success-box {
   display: flex;
   flex-direction: column;
@@ -923,4 +929,170 @@ section { padding: 6rem 5%; }
   .hero-title { font-size: 2rem; }
 
   .stat-chip { align-items: center; }
+}
+
+/* ─── Footer admin link ─── */
+.footer-admin-link {
+  display: inline-block;
+  margin-top: 1rem;
+  font-size: 0.72rem !important;
+  color: rgba(107,127,163,0.4) !important;
+  text-decoration: none;
+  letter-spacing: 0.5px;
+}
+.footer-admin-link:hover { color: var(--muted) !important; }
+
+/* ─── About Us / Founder ─── */
+.about-section {
+  background: var(--bg2);
+  position: relative;
+  overflow: hidden;
+}
+
+.about-wrapper {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 3rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  align-items: stretch;
+}
+
+.founder-card {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  padding: 3rem 2.5rem;
+  text-align: center;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.founder-glow {
+  position: absolute;
+  top: -30%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(0,245,255,0.18), transparent 70%);
+  filter: blur(20px);
+  pointer-events: none;
+}
+
+.founder-avatar {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 1.4rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 50px rgba(0,245,255,0.35);
+}
+
+.founder-avatar span {
+  font-family: 'Syne', sans-serif;
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 1px;
+}
+
+.founder-name {
+  position: relative;
+  font-family: 'Syne', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 0.3rem;
+}
+
+.founder-role {
+  position: relative;
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 1.3rem;
+}
+
+.founder-badges {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-bottom: 1.6rem;
+}
+
+.founder-badge {
+  background: rgba(0,245,255,0.08);
+  border: 1px solid rgba(0,245,255,0.2);
+  color: var(--text);
+  padding: 0.4rem 0.9rem;
+  border-radius: 99px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.founder-bio {
+  position: relative;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.7;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.about-highlights {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  justify-content: center;
+}
+
+.about-highlight-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 1.5rem 1.7rem;
+  transition: all 0.3s;
+}
+
+.about-highlight-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(0,245,255,0.3);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+}
+
+.about-highlight-icon {
+  font-size: 1.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.about-highlight-card h4 {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 0.35rem;
+}
+
+.about-highlight-card p {
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+
+@media (max-width: 900px) {
+  .about-wrapper {
+    grid-template-columns: 1fr;
+  }
+  .founder-card {
+    padding: 2.4rem 1.6rem;
+  }
 }
