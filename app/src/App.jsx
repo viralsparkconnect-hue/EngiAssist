@@ -70,6 +70,127 @@ const stats = [
   { num: "98%", label: "Success Rate" },
 ];
 
+const howItWorksSteps = [
+  {
+    num: "01",
+    icon: "📝",
+    title: "Tell Us Your Project",
+    desc: "Pick your branch, semester, and describe what you need — mini project, major project, or just guidance.",
+  },
+  {
+    num: "02",
+    icon: "🤝",
+    title: "Get Matched Instantly",
+    desc: "We connect you with the right expert for your exact branch and topic — no generic templates.",
+  },
+  {
+    num: "03",
+    icon: "⚡",
+    title: "Receive Everything You Need",
+    desc: "Working code, CAD/circuit files, IEEE-format documentation, and a polished PPT — all in one package.",
+  },
+  {
+    num: "04",
+    icon: "🎯",
+    title: "Submit With Confidence",
+    desc: "Understand every part of your project so you can explain it in viva and score full marks.",
+  },
+];
+
+const faqs = [
+  {
+    q: "Will I actually understand my own project?",
+    a: "Yes — every project comes with a plain-language walkthrough so you can explain it confidently in your viva, not just submit it.",
+  },
+  {
+    q: "Is the work original and plagiarism-free?",
+    a: "100%. Every project is built specifically for you, not copy-pasted from old submissions.",
+  },
+  {
+    q: "How fast can I get help?",
+    a: "Most requests get a response within 24–48 hours, depending on project complexity and deadline.",
+  },
+  {
+    q: "Do you help with mini projects and major final-year projects?",
+    a: "Both — from a 2-week mini project to a full major/final-year project with complete documentation.",
+  },
+  {
+    q: "What if my branch isn't fully listed?",
+    a: "Reach out anyway — the 6 branches cover most requests, but we regularly help with related and interdisciplinary topics too.",
+  },
+];
+
+const testimonials = [
+  {
+    quote: "I finally understood my own major project well enough to ace the viva. The documentation was IEEE-perfect too.",
+    name: "Aditi R.",
+    branch: "Computer Science, Final Year",
+  },
+  {
+    quote: "My CAD design for the robotic arm project was done professionally, and they explained every part of it to me.",
+    name: "Rohan K.",
+    branch: "Mechanical Engineering",
+  },
+  {
+    quote: "Fast turnaround, clean code, and a presentation that actually looked premium in front of my panel.",
+    name: "Sneha P.",
+    branch: "IT / AI & ML",
+  },
+];
+
+function useReveal() {
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.unobserve(el);
+        }
+      },
+      { threshold: 0.15 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return [ref, visible];
+}
+
+function Reveal({ children, className = "", delay = 0 }) {
+  const [ref, visible] = useReveal();
+  return (
+    <div
+      ref={ref}
+      className={`reveal ${visible ? "reveal-in" : ""} ${className}`}
+      style={{ transitionDelay: `${delay}ms` }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function CursorGlow() {
+  const glowRef = useRef(null);
+
+  useEffect(() => {
+    if (window.matchMedia("(pointer: coarse)").matches) return;
+    const move = (e) => {
+      if (glowRef.current) {
+        glowRef.current.style.transform = `translate(${e.clientX - 200}px, ${e.clientY - 200}px)`;
+      }
+    };
+    window.addEventListener("mousemove", move);
+    return () => window.removeEventListener("mousemove", move);
+  }, []);
+
+  return <div className="cursor-glow" ref={glowRef}></div>;
+}
+
 function Navbar({ active, setActive }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -208,11 +329,11 @@ function Branches() {
 
   return (
     <section className="branches-section" id="branches">
-      <div className="section-header">
+      <Reveal className="section-header">
         <span className="section-tag">All Branches</span>
         <h2>Choose Your Engineering Branch</h2>
         <p>Specialized project guidance for every discipline</p>
-      </div>
+      </Reveal>
       <div className="branches-grid">
         {branches.map((b) => (
           <div
@@ -254,32 +375,111 @@ function Branches() {
 function Services() {
   return (
     <section className="services-section" id="services">
-      <div className="section-header light">
+      <Reveal className="section-header light">
         <span className="section-tag">What We Offer</span>
         <h2>Everything You Need to Excel</h2>
         <p>Complete engineering project support from idea to submission</p>
-      </div>
+      </Reveal>
       <div className="services-grid">
-        {services.map((s) => (
-          <div key={s.title} className="service-card">
+        {services.map((s, i) => (
+          <Reveal key={s.title} delay={i * 60} className="service-card">
             <div className="service-icon">{s.icon}</div>
             <h3>{s.title}</h3>
             <p>{s.desc}</p>
-          </div>
+          </Reveal>
         ))}
       </div>
     </section>
   );
 }
 
+function HowItWorks() {
+  return (
+    <section className="how-section" id="how-it-works">
+      <Reveal className="section-header light">
+        <span className="section-tag">Simple Process</span>
+        <h2>How EngiAssist Works</h2>
+        <p>From idea to submission in 4 clear steps</p>
+      </Reveal>
+      <div className="how-grid">
+        {howItWorksSteps.map((s, i) => (
+          <Reveal key={s.num} delay={i * 100} className="how-card-wrap">
+            <div className="how-card">
+              <span className="how-num">{s.num}</span>
+              <div className="how-icon">{s.icon}</div>
+              <h3>{s.title}</h3>
+              <p>{s.desc}</p>
+            </div>
+            {i < howItWorksSteps.length - 1 && <div className="how-connector"></div>}
+          </Reveal>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function Testimonials() {
+  return (
+    <section className="testimonials-section">
+      <Reveal className="section-header">
+        <span className="section-tag">Student Voices</span>
+        <h2>What Students Say</h2>
+        <p>Real feedback from students who got their projects done right</p>
+      </Reveal>
+      <div className="testimonials-grid">
+        {testimonials.map((t, i) => (
+          <Reveal key={t.name} delay={i * 100} className="testimonial-card">
+            <div className="testimonial-quote-mark">"</div>
+            <p className="testimonial-text">{t.quote}</p>
+            <div className="testimonial-author">
+              <div className="testimonial-avatar">{t.name.charAt(0)}</div>
+              <div>
+                <div className="testimonial-name">{t.name}</div>
+                <div className="testimonial-branch">{t.branch}</div>
+              </div>
+            </div>
+          </Reveal>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function FAQ() {
+  const [open, setOpen] = useState(0);
+  return (
+    <section className="faq-section" id="faq">
+      <Reveal className="section-header light">
+        <span className="section-tag">Got Questions?</span>
+        <h2>Frequently Asked Questions</h2>
+        <p>Everything students usually ask before getting started</p>
+      </Reveal>
+      <div className="faq-list">
+        {faqs.map((f, i) => (
+          <Reveal key={f.q} delay={i * 60} className="faq-item-wrap">
+            <div className={`faq-item ${open === i ? "faq-open" : ""}`}>
+              <button className="faq-question" onClick={() => setOpen(open === i ? -1 : i)}>
+                <span>{f.q}</span>
+                <span className="faq-toggle">{open === i ? "−" : "+"}</span>
+              </button>
+              <div className="faq-answer">
+                <p>{f.a}</p>
+              </div>
+            </div>
+          </Reveal>
+        ))}
+      </div>
+    </section>
+  );
+}
 function AboutUs() {
   return (
     <section className="about-section" id="about">
-      <div className="section-header">
+      <Reveal className="section-header">
         <span className="section-tag">Who We Are</span>
         <h2>Meet the Founder</h2>
         <p>Built by an engineer, for engineers</p>
-      </div>
+      </Reveal>
 
       <div className="about-wrapper">
         <div className="founder-card">
@@ -334,11 +534,11 @@ function Projects() {
 
   return (
     <section className="projects-section" id="projects">
-      <div className="section-header">
+      <Reveal className="section-header">
         <span className="section-tag">Project Ideas</span>
         <h2>Explore Project Topics</h2>
         <p>Handpicked project ideas for each engineering branch</p>
-      </div>
+      </Reveal>
       <div className="proj-tabs">
         {branches.map((b) => (
           <button
@@ -428,11 +628,11 @@ Please contact me regarding my project.`;
 
   return (
     <section className="contact-section" id="contact">
-      <div className="section-header light">
+      <Reveal className="section-header light">
         <span className="section-tag">Get Started</span>
         <h2>Request Project Help</h2>
         <p>Tell us your branch and project needs — we'll guide you step by step</p>
-      </div>
+      </Reveal>
       <div className="contact-wrapper">
         <div className="contact-info">
           <h3>Why Choose EngiAssist?</h3>
@@ -525,12 +725,16 @@ function Landing() {
 
   return (
     <div className="app">
+      <CursorGlow />
       <Navbar active={active} setActive={setActive} />
       <Hero />
       <Branches />
+      <HowItWorks />
       <Services />
       <AboutUs />
+      <Testimonials />
       <Projects />
+      <FAQ />
       <Contact />
       <Footer />
 
