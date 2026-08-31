@@ -214,7 +214,7 @@ function Navbar({ active, setActive }) {
         {links.map((l) => (
           <li key={l}>
             <a
-              href={`#${l.toLowerCase()}`}
+              href={l === "About" ? "/about" : l === "Home" ? "/" : `/#${l.toLowerCase()}`}
               className={active === l ? "active" : ""}
               onClick={() => { setActive(l); setMobileOpen(false); }}
             >
@@ -224,7 +224,14 @@ function Navbar({ active, setActive }) {
         ))}
       </ul>
       <div className="nav-actions">
-        <button className="btn-nav-cta" onClick={() => document.getElementById("contact").scrollIntoView({ behavior: "smooth" })}>
+        <button
+          className="btn-nav-cta"
+          onClick={() => {
+            const el = document.getElementById("contact");
+            if (el) el.scrollIntoView({ behavior: "smooth" });
+            else window.location.href = "/#contact";
+          }}
+        >
           Get Help Now
         </button>
         <button className="hamburger" onClick={() => setMobileOpen(!mobileOpen)}>
@@ -528,6 +535,34 @@ function AboutUs() {
   );
 }
 
+function AboutPage() {
+  const [active, setActive] = useState("About");
+  return (
+    <div className="app">
+      <CursorGlow />
+      <Navbar active={active} setActive={setActive} />
+      <section className="about-hero">
+        <div className="hero-bg">
+          <div className="grid-overlay"></div>
+          <div className="orb orb1"></div>
+          <div className="orb orb2"></div>
+        </div>
+        <Reveal className="about-hero-content">
+          <span className="hero-badge">🎓 The Story Behind EngiAssist</span>
+          <h1 className="about-hero-title">About EngiAssist</h1>
+          <p className="hero-sub">
+            Built by an engineer who understands exactly what students need —
+            not just a finished project, but real understanding.
+          </p>
+        </Reveal>
+      </section>
+      <AboutUs />
+      <Testimonials />
+      <Footer />
+    </div>
+  );
+}
+
 function Projects() {
   const [selectedBranch, setSelectedBranch] = useState("cs");
   const current = branches.find((b) => b.id === selectedBranch);
@@ -699,12 +734,12 @@ function Footer() {
         </div>
         <p>Empowering every engineering student to build, learn, and succeed.</p>
         <div className="footer-links">
-          <a href="#home">Home</a>
-          <a href="#branches">Branches</a>
-          <a href="#services">Services</a>
-          <a href="#about">About</a>
-          <a href="#projects">Projects</a>
-          <a href="#contact">Contact</a>
+          <a href="/">Home</a>
+          <a href="/#branches">Branches</a>
+          <a href="/#services">Services</a>
+          <a href="/about">About</a>
+          <a href="/#projects">Projects</a>
+          <a href="/#contact">Contact</a>
         </div>
         <p className="footer-copy">© 2026 EngiAssist. Built for engineering students. 🇮🇳</p>
         <a className="footer-admin-link" href="/dashboard">Admin Login</a>
@@ -731,7 +766,6 @@ function Landing() {
       <Branches />
       <HowItWorks />
       <Services />
-      <AboutUs />
       <Testimonials />
       <Projects />
       <FAQ />
@@ -785,9 +819,13 @@ function Landing() {
 }
 
 export default function App() {
-  // Lightweight path-based routing — no router library needed for two pages.
-  const isDashboard =
-    typeof window !== "undefined" &&
-    window.location.pathname.replace(/\/+$/, "") === "/dashboard";
-  return isDashboard ? <Dashboard /> : <Landing />;
+  // Lightweight path-based routing — no router library needed for a few pages.
+  const path =
+    typeof window !== "undefined"
+      ? window.location.pathname.replace(/\/+$/, "") || "/"
+      : "/";
+
+  if (path === "/dashboard") return <Dashboard />;
+  if (path === "/about") return <AboutPage />;
+  return <Landing />;
 }
