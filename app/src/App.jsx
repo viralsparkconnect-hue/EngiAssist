@@ -161,6 +161,73 @@ function useReveal() {
   return [ref, visible];
 }
 
+function CountUp({ value }) {
+  const ref = useRef(null);
+  const [display, setDisplay] = useState("0");
+  const [started, setStarted] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setStarted(true);
+          obs.unobserve(el);
+        }
+      },
+      { threshold: 0.5 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!started) return;
+    const match = value.match(/^([\d,]+)(.*)$/);
+    if (!match) {
+      setDisplay(value);
+      return;
+    }
+    const target = parseInt(match[1].replace(/,/g, ""), 10);
+    const suffix = match[2];
+    const duration = 1400;
+    const startTime = performance.now();
+    let raf;
+    const tick = (now) => {
+      const progress = Math.min((now - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = Math.floor(eased * target);
+      setDisplay(current.toLocaleString() + suffix);
+      if (progress < 1) raf = requestAnimationFrame(tick);
+      else setDisplay(target.toLocaleString() + suffix);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [started, value]);
+
+  return <span ref={ref}>{display}</span>;
+}
+
+function TrustStrip() {
+  const items = [
+    { icon: "🔒", text: "100% Original Work" },
+    { icon: "⚡", text: "24–48hr Turnaround" },
+    { icon: "🎓", text: "Expert Engineers" },
+    { icon: "✅", text: "Verified & Secure" },
+  ];
+  return (
+    <div className="trust-strip">
+      {items.map((t) => (
+        <div key={t.text} className="trust-item">
+          <span className="trust-icon">{t.icon}</span>
+          <span>{t.text}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function Reveal({ children, className = "", delay = 0 }) {
   const [ref, visible] = useReveal();
   return (
@@ -312,11 +379,12 @@ function Hero() {
         <div className="hero-stats">
           {stats.map((s) => (
             <div key={s.label} className="stat-chip">
-              <span className="stat-num">{s.num}</span>
+              <span className="stat-num"><CountUp value={s.num} /></span>
               <span className="stat-label">{s.label}</span>
             </div>
           ))}
         </div>
+        <TrustStrip />
       </div>
       <div className="hero-visual">
         <div className="floating-card fc1">💻 CS Project Help</div>
