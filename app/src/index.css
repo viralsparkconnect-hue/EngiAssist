@@ -1413,3 +1413,31 @@ section { padding: 6rem 5%; }
 .about-hero .hero-sub {
   margin: 0 auto;
 }
+
+/* ─── Trust Strip ─── */
+.trust-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem 1.6rem;
+  margin-top: 1.8rem;
+  animation: fadeUp 0.6s 0.5s both;
+}
+
+.trust-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+.trust-icon {
+  font-size: 0.95rem;
+}
+
+@media (max-width: 900px) {
+  .trust-strip {
+    justify-content: center;
+  }
+}
