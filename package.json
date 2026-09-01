@@ -2,6 +2,7 @@
   "name": "engiassist-portal",
   "version": "1.0.0",
   "description": "EngiAssist - Engineering Student Project Portal",
+  "type": "module",
   "scripts": {
     "dev": "cd app && npm run dev"
   }
