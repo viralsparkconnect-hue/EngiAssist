@@ -12,10 +12,19 @@ create table if not exists public.leads (
   branch text not null,
   semester text,
   project text,
+  project_status text,                      -- idea | started | partial | almost
+  deadline date,
+  lead_code text,                           -- friendly ref shown to the student, e.g. EA-482913
   message text,
   status text not null default 'new',       -- new | contacted | closed
   created_at timestamptz not null default now()
 );
+
+-- If you already ran this schema before, run this once to add the new columns
+-- without losing existing leads:
+-- alter table public.leads add column if not exists project_status text;
+-- alter table public.leads add column if not exists deadline date;
+-- alter table public.leads add column if not exists lead_code text;
 
 -- 2. Lock the table down with Row Level Security
 alter table public.leads enable row level security;
