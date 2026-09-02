@@ -600,6 +600,46 @@ section { padding: 6rem 5%; }
   font-size: 0.875rem;
 }
 
+/* ─── Fix My Project ─── */
+.fix-section {
+  background: var(--bg2);
+  position: relative;
+}
+
+.fix-wrapper {
+  max-width: 780px;
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.fix-chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.7rem;
+}
+
+.fix-chip {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.55rem 1.1rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.25s;
+}
+
+.fix-chip:hover {
+  border-color: rgba(0,245,255,0.4);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
 /* ─── Projects ─── */
 .projects-section { background: var(--bg2); }
 
@@ -783,6 +823,14 @@ section { padding: 6rem 5%; }
 }
 
 .contact-form select option { background: var(--surface); }
+
+.contact-form input[type="date"] { color-scheme: dark; }
+
+.success-lead-code {
+  font-size: 1.1rem;
+  letter-spacing: 0.03em;
+  color: var(--accent);
+}
 
 .contact-form textarea { resize: vertical; }
 
