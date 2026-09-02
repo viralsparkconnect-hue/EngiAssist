@@ -134,7 +134,7 @@ function DashboardApp({ session, onLogout }) {
       if (statusFilter !== "all" && l.status !== statusFilter) return false;
       if (search) {
         const q = search.toLowerCase();
-        if (!l.name?.toLowerCase().includes(q) && !l.email?.toLowerCase().includes(q) && !l.project?.toLowerCase().includes(q)) {
+        if (!l.name?.toLowerCase().includes(q) && !l.email?.toLowerCase().includes(q) && !l.phone?.toLowerCase().includes(q) && !l.project?.toLowerCase().includes(q)) {
           return false;
         }
       }
@@ -161,9 +161,9 @@ function DashboardApp({ session, onLogout }) {
   }, [leads]);
 
   const exportCSV = () => {
-    const headers = ["Lead ID", "Name", "Email", "Branch", "Semester", "Project", "Current Status", "Deadline", "Message", "Status", "Submitted At"];
+    const headers = ["Lead ID", "Name", "Phone", "Email", "Branch", "Semester", "Project", "Current Status", "Deadline", "Message", "Status", "Submitted At"];
     const rows = filtered.map((l) => [
-      l.lead_code, l.name, l.email, branchMeta[l.branch]?.label || l.branch, l.semester, l.project,
+      l.lead_code, l.name, l.phone, l.email, branchMeta[l.branch]?.label || l.branch, l.semester, l.project,
       projectStatusMeta[l.project_status] || l.project_status, l.deadline, l.message, l.status,
       new Date(l.created_at).toLocaleString(),
     ]);
@@ -282,6 +282,7 @@ function DashboardApp({ session, onLogout }) {
                       <td>
                         <div className="dash-cell-name">{l.name}</div>
                         <div className="dash-cell-email">{l.email}</div>
+                        <div className="dash-cell-email">{l.phone || "—"}</div>
                       </td>
                       <td>
                         <span className="dash-chip" style={{ "--accent": branchMeta[l.branch]?.color || "#888" }}>
