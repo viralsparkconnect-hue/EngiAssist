@@ -1155,6 +1155,27 @@ section { padding: 6rem 5%; }
   white-space: nowrap;
 }
 
+.founder-linkedin {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: linear-gradient(135deg, #0a66c2, #0077b5);
+  color: #fff;
+  text-decoration: none;
+  padding: 0.55rem 1.2rem;
+  border-radius: 99px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 1.6rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.founder-linkedin:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(10,102,194,0.35);
+}
+
 .founder-bio {
   position: relative;
   color: var(--muted);
