@@ -726,6 +726,7 @@ function makeLeadCode() {
 function Contact() {
   const [form, setForm] = useState({
     name: "",
+    phone: "",
     email: "",
     branch: "cs",
     semester: "",
@@ -757,6 +758,7 @@ function Contact() {
       const { error: insertError } = await supabase.from("leads").insert([
         {
           name: form.name,
+          phone: form.phone,
           email: form.email,
           branch: form.branch,
           semester: form.semester,
@@ -777,6 +779,7 @@ function Contact() {
 New Project Help Request (Ref: ${code})
 
 Name: ${form.name}
+Phone: ${form.phone}
 Email: ${form.email}
 Branch: ${branchName}
 Semester: ${form.semester || "Not specified"}
@@ -828,22 +831,25 @@ Please contact me regarding my project.`;
           <form className="contact-form" onSubmit={submit}>
             <div className="form-row">
               <input name="name" placeholder="Your Full Name *" value={form.name} onChange={handle} required />
-              <input name="email" type="email" placeholder="Email Address *" value={form.email} onChange={handle} required />
+              <input name="phone" type="tel" placeholder="Phone / WhatsApp Number *" value={form.phone} onChange={handle} required />
             </div>
             <div className="form-row">
+              <input name="email" type="email" placeholder="Email Address *" value={form.email} onChange={handle} required />
               <select name="branch" value={form.branch} onChange={handle}>
                 {branches.map((b) => (
                   <option key={b.id} value={b.id}>{b.icon} {b.label}</option>
                 ))}
               </select>
+            </div>
+            <div className="form-row">
               <select name="semester" value={form.semester} onChange={handle}>
                 <option value="">Select Semester</option>
                 {[...Array(8)].map((_, i) => (
                   <option key={i + 1} value={i + 1}>Semester {i + 1}</option>
                 ))}
               </select>
+              <input name="project" placeholder="Project Name / Topic (if you have one)" value={form.project} onChange={handle} />
             </div>
-            <input name="project" placeholder="Project Name / Topic (if you have one)" value={form.project} onChange={handle} />
             <div className="form-row">
               <select name="projectStatus" value={form.projectStatus} onChange={handle}>
                 <option value="">Current Status</option>
@@ -889,10 +895,274 @@ function Footer() {
           <a href="/#projects">Projects</a>
           <a href="/#contact">Contact</a>
         </div>
+        <div className="footer-seo-links">
+          <div className="footer-seo-col">
+            <p className="footer-seo-title">By Branch</p>
+            {Object.entries(branchSeoContent).map(([id, c]) => (
+              <a key={id} href={c.path}>{branches.find((b) => b.id === id)?.label} Projects</a>
+            ))}
+          </div>
+          <div className="footer-seo-col">
+            <p className="footer-seo-title">By Service</p>
+            <a href="/final-year-project-help">Final Year Project Help</a>
+            {Object.entries(serviceSeoPages).map(([slug, c]) => (
+              <a key={slug} href={c.path}>{c.heading}</a>
+            ))}
+          </div>
+        </div>
         <p className="footer-copy">© 2026 EngiAssist. Built for engineering students. 🇮🇳</p>
         <a className="footer-admin-link" href="/dashboard">Admin Login</a>
       </div>
     </footer>
+  );
+}
+
+function useSeoMeta({ title, description, path }) {
+  useEffect(() => {
+    const prevTitle = document.title;
+    document.title = title;
+
+    const setMeta = (selector, attr, value) => {
+      const el = document.querySelector(selector);
+      if (el) el.setAttribute(attr, value);
+    };
+    setMeta('meta[name="description"]', "content", description);
+    setMeta('meta[property="og:title"]', "content", title);
+    setMeta('meta[property="og:description"]', "content", description);
+    setMeta('meta[name="twitter:title"]', "content", title);
+    setMeta('meta[name="twitter:description"]', "content", description);
+    const url = `https://www.engiassist.in${path}`;
+    setMeta('link[rel="canonical"]', "href", url);
+    setMeta('meta[property="og:url"]', "content", url);
+
+    return () => {
+      document.title = prevTitle;
+    };
+  }, [title, description, path]);
+}
+
+function SeoCta({ heading = "Ready to get started?" }) {
+  const openWhatsApp = () => {
+    const message = "Hello EngiAssist! I need help with my engineering project.";
+    window.open(`https://wa.me/919021698707?text=${encodeURIComponent(message)}`, "_blank");
+  };
+  return (
+    <section className="seo-cta">
+      <Reveal className="seo-cta-inner">
+        <h2>{heading}</h2>
+        <div className="hero-btns">
+          <button className="btn-primary" onClick={openWhatsApp}>Chat on WhatsApp 🚀</button>
+          <a className="btn-secondary" href="/#contact">Request This Service ↗</a>
+        </div>
+      </Reveal>
+    </section>
+  );
+}
+
+// Branch-specific SEO landing page — reuses real branch/project data so each
+// page has genuinely distinct content instead of a templated re-skin.
+const branchSeoContent = {
+  cs: {
+    path: "/cse-project-help",
+    title: "CSE Project Help — Web, DSA, DBMS & OS Projects | EngiAssist",
+    metaDescription: "Get expert help with Computer Science engineering projects — web development, DSA, OS, DBMS and app development. Working code, documentation and viva support.",
+    intro: "Computer Science projects are judged on more than working code — evaluators expect you to explain your architecture, your database design and your algorithmic choices. We help CSE and B.Tech students plan, build and document projects across web development, DSA-heavy systems, database-driven apps and operating-systems coursework, so you walk into your review able to answer anything asked.",
+  },
+  it: {
+    path: "/ai-ml-project-help",
+    title: "AI/ML & IT Project Help — Deep Learning, NLP, Cloud | EngiAssist",
+    metaDescription: "Project assistance for AI, Machine Learning, NLP, Cloud and Cybersecurity coursework. Real datasets, working models and documentation explained clearly.",
+    intro: "AI/ML and IT projects live or die on whether you can explain your model, your dataset choices and your evaluation metrics — not just whether the notebook runs. We help IT and AI/ML students build classifiers, NLP pipelines, cloud-deployed dashboards and cybersecurity projects with real datasets, and walk through the reasoning behind every design decision so it's genuinely yours to defend.",
+  },
+  mech: {
+    path: "/mechanical-project-help",
+    title: "Mechanical Engineering Project Help — CAD, Robotics & Design | EngiAssist",
+    metaDescription: "Mechanical engineering project support — CAD design, thermodynamics, fluid mechanics and robotics projects with working models and full documentation.",
+    intro: "Mechanical projects usually combine a CAD model, hand calculations and a physical or simulated justification for your design choices. We help mechanical engineering students with CAD design work, thermodynamics and fluid-mechanics analysis, and robotics builds — plus the documentation that ties the calculations to the final design so your panel sees a coherent project, not disconnected parts.",
+  },
+  civil: {
+    path: "/civil-project-help",
+    title: "Civil Engineering Project Help — Structural Design & AutoCAD | EngiAssist",
+    metaDescription: "Civil engineering project assistance — structural design, AutoCAD drawings, surveying and construction technology projects with complete reports.",
+    intro: "Civil engineering projects are usually assessed on whether your structural design holds up to scrutiny and whether your drawings and calculations are consistent with each other. We help civil engineering students with structural design, AutoCAD drafting, surveying work and construction-technology projects, along with the technical report that explains your design logic clearly.",
+  },
+  elec: {
+    path: "/electronics-project-help",
+    title: "ECE Project Help — Embedded Systems, IoT & PCB Design | EngiAssist",
+    metaDescription: "Electronics and communication engineering project help — circuit design, embedded systems, IoT builds, VLSI and PCB design with working hardware.",
+    intro: "ECE projects need a working circuit or embedded build, not just a schematic on paper. We help electronics and communication engineering students with circuit design, embedded systems, IoT projects, VLSI work and PCB design — and make sure you understand every component choice well enough to explain it during your viva, not just plug it in.",
+  },
+  chem: {
+    path: "/chemical-project-help",
+    title: "Chemical Engineering Project Help — Process Design & Simulation | EngiAssist",
+    metaDescription: "Chemical engineering project support — process design, simulation, material science and environmental engineering projects with full documentation.",
+    intro: "Chemical engineering projects usually hinge on process design logic and simulation results holding together end to end. We help chemical engineering students with process design, simulation work, material-science studies and environmental-engineering projects, along with documentation that connects your assumptions to your results clearly.",
+  },
+};
+
+function BranchSeoPage({ branchId }) {
+  const [active, setActive] = useState("Branches");
+  const branch = branches.find((b) => b.id === branchId);
+  const content = branchSeoContent[branchId];
+  useSeoMeta({ title: content.title, description: content.metaDescription, path: content.path });
+
+  return (
+    <div className="app">
+      <CursorGlow />
+      <Navbar active={active} setActive={setActive} />
+      <section className="about-hero">
+        <div className="hero-bg">
+          <div className="grid-overlay"></div>
+          <div className="orb orb1"></div>
+          <div className="orb orb2"></div>
+        </div>
+        <Reveal className="about-hero-content">
+          <span className="hero-badge">{branch.icon} {branch.label}</span>
+          <h1 className="about-hero-title">{branch.label} Project Assistance</h1>
+          <p className="hero-sub">{branch.desc}</p>
+        </Reveal>
+      </section>
+      <section className="seo-body">
+        <Reveal className="seo-body-inner">
+          <p>{content.intro}</p>
+        </Reveal>
+      </section>
+      <section className="projects-section" id="projects">
+        <Reveal className="section-header">
+          <span className="section-tag">Popular Topics</span>
+          <h2>{branch.label} Project Ideas</h2>
+          <p>A starting point — we also build custom topics around your requirement</p>
+        </Reveal>
+        <div className="proj-cards" style={{ "--accent": branch.color }}>
+          {branch.projects.map((p, i) => (
+            <div key={p} className="proj-card" style={{ animationDelay: `${i * 0.07}s` }}>
+              <div className="proj-number">0{i + 1}</div>
+              <div className="proj-name">{p}</div>
+              <div className="proj-branch">{branch.icon} {branch.label}</div>
+              <a className="proj-btn" href="/#contact">Get This Project →</a>
+            </div>
+          ))}
+        </div>
+      </section>
+      <HowItWorks />
+      <FixMyProject />
+      <FAQ />
+      <SeoCta heading={`Need help with your ${branch.label} project?`} />
+      <Footer />
+    </div>
+  );
+}
+
+// Service-specific SEO landing pages.
+const serviceSeoPages = {
+  "project-debugging": {
+    path: "/project-debugging",
+    title: "Project Debugging Help for Engineering Students | EngiAssist",
+    metaDescription: "Stuck with a broken engineering project? Get help fixing code errors, missing modules and database issues — for any branch, at any stage of completion.",
+    heading: "Project Debugging & Error Fixing",
+    intro: "Most engineering students don't need a project built from zero — they need help finishing one that's already 50–80% done. We review existing code, identify what's actually broken (a bug, a missing module, a database misconfiguration, or a UI issue), and fix it while explaining what went wrong, so the next issue doesn't stump you again.",
+    items: fixItems,
+  },
+  "project-documentation-help": {
+    path: "/project-documentation-help",
+    title: "Project Documentation & Report Writing Help | EngiAssist",
+    metaDescription: "IEEE-format project reports, synopsis, SRS documents and technical diagrams for engineering final year and mini projects.",
+    heading: "Project Documentation & Reports",
+    intro: "A working project without proper documentation loses marks it shouldn't. We help engineering students put together IEEE-format project reports, synopsis documents, SRS write-ups and technical diagrams that actually match what you built — not generic templates padded with filler.",
+    items: ["Project Report", "Synopsis", "SRS Document", "Technical Diagrams", "Abstract Writing", "Reference Formatting"],
+  },
+  "viva-preparation": {
+    path: "/viva-preparation",
+    title: "Viva Preparation for Engineering Projects | EngiAssist",
+    metaDescription: "Understand your engineering project well enough to defend it confidently in your viva — plain-language walkthroughs for every branch.",
+    heading: "Viva & Project Explanation",
+    intro: "The most common reason students lose marks isn't a weak project — it's not being able to explain it under questioning. We walk you through your own project in plain language: why you made each design choice, how each module works, and what to say when a panel member asks 'why not do it this way instead?'",
+    items: ["Concept Walkthrough", "Likely Questions", "Design Justification", "Code Explanation", "Mock Viva Practice", "Confidence Building"],
+  },
+  "ppt-presentation-help": {
+    path: "/ppt-presentation-help",
+    title: "Project PPT & Presentation Design Help | EngiAssist",
+    metaDescription: "Professional PPT design and presentation preparation for engineering project submissions and final year project defense.",
+    heading: "PPT & Presentation Design",
+    intro: "A cluttered, generic-template slide deck undersells a good project. We help design clean, professional presentations that highlight your actual work — problem statement, methodology, results — and prepare you to present it clearly within the time you're given.",
+    items: ["Slide Design", "Content Structuring", "Speaker Notes", "Presentation Practice", "Timing Guidance", "Visual Diagrams"],
+  },
+};
+
+function ServiceSeoPage({ slug }) {
+  const [active, setActive] = useState("Services");
+  const content = serviceSeoPages[slug];
+  useSeoMeta({ title: content.title, description: content.metaDescription, path: content.path });
+
+  return (
+    <div className="app">
+      <CursorGlow />
+      <Navbar active={active} setActive={setActive} />
+      <section className="about-hero">
+        <div className="hero-bg">
+          <div className="grid-overlay"></div>
+          <div className="orb orb1"></div>
+          <div className="orb orb2"></div>
+        </div>
+        <Reveal className="about-hero-content">
+          <span className="hero-badge">🎓 Engineering Project Support</span>
+          <h1 className="about-hero-title">{content.heading}</h1>
+          <p className="hero-sub">{content.intro}</p>
+        </Reveal>
+      </section>
+      <section className="fix-section">
+        <Reveal className="fix-wrapper" delay={100}>
+          <div className="fix-chips">
+            {content.items.map((f) => (
+              <span key={f} className="fix-chip">{f}</span>
+            ))}
+          </div>
+        </Reveal>
+      </section>
+      <Branches />
+      <HowItWorks />
+      <FAQ />
+      <SeoCta heading={`Need help with ${content.heading.toLowerCase()}?`} />
+      <Footer />
+    </div>
+  );
+}
+
+function FinalYearProjectPage() {
+  const [active, setActive] = useState("Home");
+  useSeoMeta({
+    title: "Final Year Project Help for Engineering Students | EngiAssist",
+    description: "Complete final year project assistance for B.Tech, BE and Diploma students — development, debugging, documentation, PPT and viva preparation, across all branches.",
+    path: "/final-year-project-help",
+  });
+
+  return (
+    <div className="app">
+      <CursorGlow />
+      <Navbar active={active} setActive={setActive} />
+      <section className="about-hero">
+        <div className="hero-bg">
+          <div className="grid-overlay"></div>
+          <div className="orb orb1"></div>
+          <div className="orb orb2"></div>
+        </div>
+        <Reveal className="about-hero-content">
+          <span className="hero-badge">🎓 Final Year Project Assistance</span>
+          <h1 className="about-hero-title">Final Year Project Help, Start to Submission</h1>
+          <p className="hero-sub">
+            From choosing a topic to building it, documenting it and defending it in your viva —
+            support for B.Tech, BE and Diploma students across every engineering branch.
+          </p>
+        </Reveal>
+      </section>
+      <Branches />
+      <HowItWorks />
+      <Services />
+      <FixMyProject />
+      <FAQ />
+      <SeoCta heading="Ready to start your final year project?" />
+      <Footer />
+    </div>
   );
 }
 
@@ -976,5 +1246,13 @@ export default function App() {
 
   if (path === "/dashboard") return <Dashboard />;
   if (path === "/about") return <AboutPage />;
+  if (path === "/final-year-project-help") return <FinalYearProjectPage />;
+
+  const branchMatch = Object.entries(branchSeoContent).find(([, c]) => c.path === path);
+  if (branchMatch) return <BranchSeoPage branchId={branchMatch[0]} />;
+
+  const serviceMatch = Object.entries(serviceSeoPages).find(([, c]) => c.path === path);
+  if (serviceMatch) return <ServiceSeoPage slug={serviceMatch[0]} />;
+
   return <Landing />;
 }
