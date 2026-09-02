@@ -8,6 +8,7 @@
 create table if not exists public.leads (
   id uuid primary key default gen_random_uuid(),
   name text not null,
+  phone text,
   email text not null,
   branch text not null,
   semester text,
@@ -25,6 +26,7 @@ create table if not exists public.leads (
 -- alter table public.leads add column if not exists project_status text;
 -- alter table public.leads add column if not exists deadline date;
 -- alter table public.leads add column if not exists lead_code text;
+-- alter table public.leads add column if not exists phone text;
 
 -- 2. Lock the table down with Row Level Security
 alter table public.leads enable row level security;
