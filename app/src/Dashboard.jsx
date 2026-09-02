@@ -2,6 +2,13 @@ import { useState, useEffect, useMemo } from "react";
 import "./dashboard.css";
 import { supabase } from "./lib/supabaseClient";
 
+const projectStatusMeta = {
+  idea: "Only Idea",
+  started: "Started",
+  partial: "Partially Completed",
+  almost: "Almost Completed",
+};
+
 const branchMeta = {
   cs: { label: "Computer Science", icon: "💻", color: "#00f5ff" },
   mech: { label: "Mechanical", icon: "⚙️", color: "#ff9500" },
@@ -154,9 +161,10 @@ function DashboardApp({ session, onLogout }) {
   }, [leads]);
 
   const exportCSV = () => {
-    const headers = ["Name", "Email", "Branch", "Semester", "Project", "Message", "Status", "Submitted At"];
+    const headers = ["Lead ID", "Name", "Email", "Branch", "Semester", "Project", "Current Status", "Deadline", "Message", "Status", "Submitted At"];
     const rows = filtered.map((l) => [
-      l.name, l.email, branchMeta[l.branch]?.label || l.branch, l.semester, l.project, l.message, l.status,
+      l.lead_code, l.name, l.email, branchMeta[l.branch]?.label || l.branch, l.semester, l.project,
+      projectStatusMeta[l.project_status] || l.project_status, l.deadline, l.message, l.status,
       new Date(l.created_at).toLocaleString(),
     ]);
     const csv = [headers, ...rows]
@@ -254,10 +262,13 @@ function DashboardApp({ session, onLogout }) {
               <table className="dash-table">
                 <thead>
                   <tr>
+                    <th>Lead ID</th>
                     <th>Student</th>
                     <th>Branch</th>
                     <th>Semester</th>
                     <th>Project</th>
+                    <th>Current Status</th>
+                    <th>Deadline</th>
                     <th>Message</th>
                     <th>Submitted</th>
                     <th>Status</th>
@@ -267,6 +278,7 @@ function DashboardApp({ session, onLogout }) {
                 <tbody>
                   {filtered.map((l) => (
                     <tr key={l.id}>
+                      <td>{l.lead_code || "—"}</td>
                       <td>
                         <div className="dash-cell-name">{l.name}</div>
                         <div className="dash-cell-email">{l.email}</div>
@@ -278,6 +290,8 @@ function DashboardApp({ session, onLogout }) {
                       </td>
                       <td>{l.semester || "—"}</td>
                       <td>{l.project || "—"}</td>
+                      <td>{projectStatusMeta[l.project_status] || "—"}</td>
+                      <td>{l.deadline || "—"}</td>
                       <td className="dash-cell-message" title={l.message}>{l.message || "—"}</td>
                       <td>{new Date(l.created_at).toLocaleDateString()} <span className="dash-time">{new Date(l.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span></td>
                       <td>
