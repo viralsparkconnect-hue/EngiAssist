@@ -603,15 +603,24 @@ function AboutUs() {
 
           <div className="founder-badges">
             <span className="founder-badge">⚙️ Mechanical Engineer</span>
-            <span className="founder-badge">📈 Marketing Manager In Solar industry</span>
+            <span className="founder-badge">📈 Marketing Manager @ In Solar industry</span>
             <span className="founder-badge">📍 Jalgaon, Maharashtra</span>
           </div>
+
+          <a
+            href="https://www.linkedin.com/in/pratik-patil-7347512b2/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="founder-linkedin"
+          >
+            🔗 Connect on LinkedIn
+          </a>
 
           <p className="founder-bio">
             Pratik founded EngiAssist to give engineering students across every
             branch the same project guidance and support he wished he'd had —
             combining hands-on mechanical engineering expertise with real-world
-            marketing and leadership experience at In Solar industry. Based in
+            marketing and leadership experience In Solar industry. Based in
             Jalgaon, Maharashtra, he's built EngiAssist into a trusted resource
             for thousands of students working on mini and major projects.
           </p>
