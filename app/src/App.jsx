@@ -120,6 +120,17 @@ const faqs = [
   },
 ];
 
+const fixItems = [
+  "Code Errors",
+  "Missing Modules",
+  "Database Problems",
+  "Documentation",
+  "UI Improvements",
+  "Testing",
+  "PPT",
+  "Viva Preparation",
+];
+
 const testimonials = [
   {
     quote: "I finally understood my own major project well enough to ace the viva. The documentation was IEEE-perfect too.",
@@ -493,6 +504,31 @@ function HowItWorks() {
   );
 }
 
+function FixMyProject() {
+  return (
+    <section className="fix-section" id="fix-my-project">
+      <Reveal className="section-header">
+        <span className="section-tag">Already In Progress?</span>
+        <h2>Your Project Doesn't Have To Start From Zero</h2>
+        <p>Already have a project? We can help you fix, finish, or explain it.</p>
+      </Reveal>
+      <Reveal className="fix-wrapper" delay={100}>
+        <div className="fix-chips">
+          {fixItems.map((f) => (
+            <span key={f} className="fix-chip">{f}</span>
+          ))}
+        </div>
+        <button
+          className="btn-primary"
+          onClick={() => document.getElementById("contact").scrollIntoView({ behavior: "smooth" })}
+        >
+          Get Help With My Existing Project →
+        </button>
+      </Reveal>
+    </section>
+  );
+}
+
 function Testimonials() {
   return (
     <section className="testimonials-section">
@@ -673,10 +709,34 @@ function Projects() {
   );
 }
 
+const projectStatusOptions = [
+  { value: "idea", label: "Only Idea" },
+  { value: "started", label: "Started" },
+  { value: "partial", label: "Partially Completed" },
+  { value: "almost", label: "Almost Completed" },
+];
+
+function makeLeadCode() {
+  // Short human-readable reference the student can quote over WhatsApp —
+  // not a database key, just something friendlier than a UUID.
+  const n = Date.now().toString().slice(-6);
+  return `EA-${n}`;
+}
+
 function Contact() {
-  const [form, setForm] = useState({ name: "", email: "", branch: "cs", semester: "", project: "", message: "" });
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    branch: "cs",
+    semester: "",
+    project: "",
+    projectStatus: "",
+    deadline: "",
+    message: "",
+  });
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [leadCode, setLeadCode] = useState("");
 
   const handle = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -686,6 +746,10 @@ function Contact() {
 
     const branchName =
       branches.find((b) => b.id === form.branch)?.label || form.branch;
+    const statusLabel =
+      projectStatusOptions.find((s) => s.value === form.projectStatus)?.label || "Not specified";
+
+    const code = makeLeadCode();
 
     // Save the lead so it shows up in /dashboard — if this fails (e.g. offline),
     // we still let the student reach us on WhatsApp below.
@@ -697,7 +761,10 @@ function Contact() {
           branch: form.branch,
           semester: form.semester,
           project: form.project,
+          project_status: form.projectStatus || null,
+          deadline: form.deadline || null,
           message: form.message,
+          lead_code: code,
         },
       ]);
       if (insertError) console.error("Lead save failed:", insertError.message);
@@ -707,13 +774,15 @@ function Contact() {
 
     const message = `Hello EngiAssist!
 
-New Project Help Request
+New Project Help Request (Ref: ${code})
 
 Name: ${form.name}
 Email: ${form.email}
 Branch: ${branchName}
 Semester: ${form.semester || "Not specified"}
 Project: ${form.project || "Not specified"}
+Current Status: ${statusLabel}
+Deadline: ${form.deadline || "Not specified"}
 
 Message:
 ${form.message || "No message provided"}
@@ -726,6 +795,7 @@ Please contact me regarding my project.`;
     window.open(whatsappUrl, "_blank");
 
     setSubmitting(false);
+    setLeadCode(code);
     setSubmitted(true);
   };
 
@@ -774,7 +844,16 @@ Please contact me regarding my project.`;
               </select>
             </div>
             <input name="project" placeholder="Project Name / Topic (if you have one)" value={form.project} onChange={handle} />
-            <textarea name="message" placeholder="Describe what help you need (project type, deadline, specific requirements...)" rows={4} value={form.message} onChange={handle}></textarea>
+            <div className="form-row">
+              <select name="projectStatus" value={form.projectStatus} onChange={handle}>
+                <option value="">Current Status</option>
+                {projectStatusOptions.map((s) => (
+                  <option key={s.value} value={s.value}>{s.label}</option>
+                ))}
+              </select>
+              <input name="deadline" type="date" placeholder="Deadline" value={form.deadline} onChange={handle} />
+            </div>
+            <textarea name="message" placeholder="Describe what help you need (specific requirements, existing issues, etc.)" rows={4} value={form.message} onChange={handle}></textarea>
             <button type="submit" className="btn-submit" disabled={submitting}>
               {submitting ? "Submitting..." : "Submit Request 🚀"}
             </button>
@@ -782,8 +861,9 @@ Please contact me regarding my project.`;
         ) : (
           <div className="success-box">
             <div className="success-icon">🎉</div>
-            <h3>Request Received!</h3>
-            <p>We'll reach out to you within 24 hours. Check your email at <strong>{form.email}</strong></p>
+            <h3>Requirement Received!</h3>
+            <p className="success-lead-code">Reference ID: <strong>{leadCode}</strong></p>
+            <p>Our team will review your requirement and reach out on WhatsApp. Quote the reference above if you follow up with us.</p>
             <button className="btn-primary" onClick={() => setSubmitted(false)}>Submit Another Request</button>
           </div>
         )}
@@ -834,6 +914,7 @@ function Landing() {
       <Branches />
       <HowItWorks />
       <Services />
+      <FixMyProject />
       <Testimonials />
       <Projects />
       <FAQ />
