@@ -894,7 +894,7 @@ section { padding: 6rem 5%; }
 }
 
 .footer-inner {
-  max-width: 600px;
+  max-width: 760px;
   margin: 0 auto;
 }
 
@@ -932,6 +932,70 @@ section { padding: 6rem 5%; }
 }
 
 .footer-links a:hover { color: var(--accent); }
+
+.footer-seo-links {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  flex-wrap: wrap;
+  text-align: left;
+  border-top: 1px solid var(--border);
+  padding-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.footer-seo-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 180px;
+}
+
+.footer-seo-title {
+  font-size: 0.75rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text) !important;
+  font-weight: 700;
+  margin-bottom: 0.2rem !important;
+}
+
+.footer-seo-col a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.82rem;
+  transition: color 0.2s;
+}
+
+.footer-seo-col a:hover { color: var(--accent); }
+
+/* ─── SEO landing pages (branch / service) ─── */
+.seo-body {
+  background: var(--bg);
+  padding: 3rem 1.5rem;
+}
+
+.seo-body-inner {
+  max-width: 760px;
+  margin: 0 auto;
+  color: var(--muted);
+  font-size: 1.02rem;
+  line-height: 1.75;
+  text-align: center;
+}
+
+.seo-cta {
+  background: var(--bg2);
+  padding: 4rem 1.5rem;
+  text-align: center;
+}
+
+.seo-cta-inner h2 {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 1.6rem;
+  color: #fff;
+  margin-bottom: 1.5rem;
+}
 
 .footer-copy {
   font-size: 0.8rem !important;
