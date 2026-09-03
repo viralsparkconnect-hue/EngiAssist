@@ -54,6 +54,27 @@ const branches = [
   },
 ];
 
+// Maps a project title to a relevant emoji icon by keyword, so project
+// cards get a visual anchor beyond a plain number. Falls back to the
+// branch's own icon when no keyword matches.
+const projectIconMap = {
+  website: "🌐", portfolio: "🌐", chat: "💬", ml: "🧠", model: "🧠",
+  api: "🔌", "e-commerce": "🛒", ecommerce: "🛒",
+  robotic: "🦾", robot: "🦾", heat: "🔥", exchanger: "🔥", gear: "⚙️",
+  cad: "📐", drone: "🛸",
+  bridge: "🌉", city: "🏙️", earthquake: "🌋", water: "💧", building: "🏢", green: "🏢",
+  iot: "🏠", "smart home": "🏠", arduino: "🔧", pcb: "🖲️", signal: "📡", power: "🔋",
+  chatbot: "🤖", nlp: "🤖", image: "🖼️", classifier: "🖼️", fraud: "🕵️",
+  cloud: "☁️", face: "🙂", recognition: "🙂",
+  reactor: "⚗️", distillation: "🧪", wastewater: "🚰", polymer: "🧬", catalyst: "🔬",
+};
+
+function projectIcon(name, fallback) {
+  const lower = name.toLowerCase();
+  const hit = Object.keys(projectIconMap).find((key) => lower.includes(key));
+  return hit ? projectIconMap[hit] : fallback;
+}
+
 const services = [
   { icon: "🚀", title: "Project Ideas", desc: "100+ curated project topics for every branch & semester" },
   { icon: "📋", title: "Full Documentation", desc: "IEEE-format reports, abstracts, and project reports" },
@@ -655,6 +676,7 @@ function Projects() {
       <div className="proj-cards" style={{ "--accent": current.color }}>
         {current.projects.map((p, i) => (
           <div key={p} className="proj-card" style={{ animationDelay: `${i * 0.07}s` }}>
+            <div className="proj-icon-badge">{projectIcon(p, current.icon)}</div>
             <div className="proj-number">0{i + 1}</div>
             <div className="proj-name">{p}</div>
             <div className="proj-branch">{current.icon} {current.label}</div>
@@ -979,6 +1001,7 @@ function BranchSeoPage({ branchId }) {
           <div className="orb orb2"></div>
         </div>
         <Reveal className="about-hero-content">
+          <div className="seo-icon-badge" style={{ "--accent": branch.color }}>{branch.icon}</div>
           <span className="hero-badge">{branch.icon} {branch.label}</span>
           <h1 className="about-hero-title">{branch.label} Project Assistance</h1>
           <p className="hero-sub">{branch.desc}</p>
@@ -998,6 +1021,7 @@ function BranchSeoPage({ branchId }) {
         <div className="proj-cards" style={{ "--accent": branch.color }}>
           {branch.projects.map((p, i) => (
             <div key={p} className="proj-card" style={{ animationDelay: `${i * 0.07}s` }}>
+              <div className="proj-icon-badge">{projectIcon(p, branch.icon)}</div>
               <div className="proj-number">0{i + 1}</div>
               <div className="proj-name">{p}</div>
               <div className="proj-branch">{branch.icon} {branch.label}</div>
@@ -1019,6 +1043,7 @@ function BranchSeoPage({ branchId }) {
 const serviceSeoPages = {
   "project-debugging": {
     path: "/project-debugging",
+    icon: "🛠️",
     title: "Project Debugging Help for Engineering Students | EngiAssist",
     metaDescription: "Stuck with a broken engineering project? Get help fixing code errors, missing modules and database issues — for any branch, at any stage of completion.",
     heading: "Project Debugging & Error Fixing",
@@ -1027,6 +1052,7 @@ const serviceSeoPages = {
   },
   "project-documentation-help": {
     path: "/project-documentation-help",
+    icon: "📋",
     title: "Project Documentation & Report Writing Help | EngiAssist",
     metaDescription: "IEEE-format project reports, synopsis, SRS documents and technical diagrams for engineering final year and mini projects.",
     heading: "Project Documentation & Reports",
@@ -1035,6 +1061,7 @@ const serviceSeoPages = {
   },
   "viva-preparation": {
     path: "/viva-preparation",
+    icon: "🎤",
     title: "Viva Preparation for Engineering Projects | EngiAssist",
     metaDescription: "Understand your engineering project well enough to defend it confidently in your viva — plain-language walkthroughs for every branch.",
     heading: "Viva & Project Explanation",
@@ -1043,11 +1070,21 @@ const serviceSeoPages = {
   },
   "ppt-presentation-help": {
     path: "/ppt-presentation-help",
+    icon: "📊",
     title: "Project PPT & Presentation Design Help | EngiAssist",
     metaDescription: "Professional PPT design and presentation preparation for engineering project submissions and final year project defense.",
     heading: "PPT & Presentation Design",
     intro: "A cluttered, generic-template slide deck undersells a good project. We help design clean, professional presentations that highlight your actual work — problem statement, methodology, results — and prepare you to present it clearly within the time you're given.",
     items: ["Slide Design", "Content Structuring", "Speaker Notes", "Presentation Practice", "Timing Guidance", "Visual Diagrams"],
+  },
+  "career-placement-guidance": {
+    path: "/career-placement-guidance",
+    icon: "🎯",
+    title: "Career & Placement Guidance for Engineering Students | EngiAssist",
+    metaDescription: "Resume building, mock interviews, internship guidance and placement prep for engineering students — practical support, no false promises.",
+    heading: "Career & Placement Guidance",
+    intro: "A strong project counts for little if it isn't backed by a resume and interview performance that reflect it. We help engineering students turn their coursework and projects into a placement-ready profile — practical, one-on-one support, not a guaranteed-job pitch.",
+    items: ["Resume Building", "Mock Interviews", "Internship Guidance", "LinkedIn Profile Review", "Aptitude Prep", "Career Roadmap"],
   },
 };
 
@@ -1067,6 +1104,7 @@ function ServiceSeoPage({ slug }) {
           <div className="orb orb2"></div>
         </div>
         <Reveal className="about-hero-content">
+          <div className="seo-icon-badge">{content.icon}</div>
           <span className="hero-badge">🎓 Engineering Project Support</span>
           <h1 className="about-hero-title">{content.heading}</h1>
           <p className="hero-sub">{content.intro}</p>
@@ -1109,6 +1147,7 @@ function FinalYearProjectPage() {
           <div className="orb orb2"></div>
         </div>
         <Reveal className="about-hero-content">
+          <div className="seo-icon-badge">🎓</div>
           <span className="hero-badge">🎓 Final Year Project Assistance</span>
           <h1 className="about-hero-title">Final Year Project Help, Start to Submission</h1>
           <p className="hero-sub">
@@ -1128,15 +1167,59 @@ function FinalYearProjectPage() {
   );
 }
 
-function Landing() {
-  const [active, setActive] = useState("Home");
-
+function FloatingWhatsApp() {
   const openWhatsApp = () => {
     const message = "Hello EngiAssist! I need help with my engineering project.";
-    const whatsappUrl = `https://wa.me/919021698707?text=${encodeURIComponent(message)}`;
-
-    window.open(whatsappUrl, "_blank");
+    window.open(`https://wa.me/919021698707?text=${encodeURIComponent(message)}`, "_blank");
   };
+
+  return (
+    <button
+      onClick={openWhatsApp}
+      aria-label="Chat with us on WhatsApp"
+      title="Chat with us on WhatsApp"
+      style={{
+        position: "fixed",
+        right: "24px",
+        bottom: "24px",
+        width: "60px",
+        height: "60px",
+        borderRadius: "50%",
+        border: "none",
+        background: "#25D366",
+        color: "white",
+        fontSize: "30px",
+        cursor: "pointer",
+        zIndex: 9999,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        boxShadow: "0 6px 20px rgba(0, 0, 0, 0.3)",
+        transition: "transform 0.2s ease",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = "scale(1.1)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = "scale(1)";
+      }}
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        width="32"
+        height="32"
+        fill="white"
+        aria-hidden="true"
+      >
+        <path d="M20.52 3.449A11.86 11.86 0 0 0 12.05 0C5.495 0 .163 5.332.163 11.89c0 2.096.548 4.142 1.588 5.946L0 24l6.335-1.655a11.88 11.88 0 0 0 5.709 1.447h.005c6.554 0 11.887-5.332 11.887-11.89a11.85 11.85 0 0 0-3.416-8.453zM12.05 21.79h-.004a9.87 9.87 0 0 1-5.032-1.378l-.361-.214-3.76.982 1.004-3.67-.235-.375a9.87 9.87 0 0 1-1.51-5.245c0-5.442 4.43-9.872 9.877-9.872a9.83 9.83 0 0 1 6.994 2.9 9.83 9.83 0 0 1 2.894 6.994c-.003 5.445-4.433 9.878-9.867 9.878zm5.413-7.397c-.297-.149-1.758-.867-2.03-.967-.273-.099-.472-.148-.67.149-.198.297-.767.966-.94 1.164-.173.198-.347.223-.644.075-.297-.149-1.256-.463-2.39-1.475-.883-.788-1.48-1.762-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.173.198-.298.298-.496.099-.198.05-.372-.025-.521-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.501-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.075-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
+      </svg>
+    </button>
+  );
+}
+
+function Landing() {
+  const [active, setActive] = useState("Home");
 
   return (
     <div className="app">
@@ -1152,49 +1235,7 @@ function Landing() {
       <FAQ />
       <Contact />
       <Footer />
-
-      {/* Floating WhatsApp Button */}
-      <button
-        onClick={openWhatsApp}
-        aria-label="Chat with us on WhatsApp"
-        title="Chat with us on WhatsApp"
-        style={{
-          position: "fixed",
-          right: "24px",
-          bottom: "24px",
-          width: "60px",
-          height: "60px",
-          borderRadius: "50%",
-          border: "none",
-          background: "#25D366",
-          color: "white",
-          fontSize: "30px",
-          cursor: "pointer",
-          zIndex: 9999,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          boxShadow: "0 6px 20px rgba(0, 0, 0, 0.3)",
-          transition: "transform 0.2s ease",
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = "scale(1.1)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = "scale(1)";
-        }}
-      >
-        <svg
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 24 24"
-  width="32"
-  height="32"
-  fill="white"
-  aria-hidden="true"
->
-  <path d="M20.52 3.449A11.86 11.86 0 0 0 12.05 0C5.495 0 .163 5.332.163 11.89c0 2.096.548 4.142 1.588 5.946L0 24l6.335-1.655a11.88 11.88 0 0 0 5.709 1.447h.005c6.554 0 11.887-5.332 11.887-11.89a11.85 11.85 0 0 0-3.416-8.453zM12.05 21.79h-.004a9.87 9.87 0 0 1-5.032-1.378l-.361-.214-3.76.982 1.004-3.67-.235-.375a9.87 9.87 0 0 1-1.51-5.245c0-5.442 4.43-9.872 9.877-9.872a9.83 9.83 0 0 1 6.994 2.9 9.83 9.83 0 0 1 2.894 6.994c-.003 5.445-4.433 9.878-9.867 9.878zm5.413-7.397c-.297-.149-1.758-.867-2.03-.967-.273-.099-.472-.148-.67.149-.198.297-.767.966-.94 1.164-.173.198-.347.223-.644.075-.297-.149-1.256-.463-2.39-1.475-.883-.788-1.48-1.762-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.173.198-.298.298-.496.099-.198.05-.372-.025-.521-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.501-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.075-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
-</svg>
-      </button>
+      <FloatingWhatsApp />
     </div>
   );
 }
@@ -1207,14 +1248,22 @@ export default function App() {
       : "/";
 
   if (path === "/dashboard") return <Dashboard />;
-  if (path === "/about") return <AboutPage />;
-  if (path === "/final-year-project-help") return <FinalYearProjectPage />;
 
-  const branchMatch = Object.entries(branchSeoContent).find(([, c]) => c.path === path);
-  if (branchMatch) return <BranchSeoPage branchId={branchMatch[0]} />;
+  let page;
+  if (path === "/about") page = <AboutPage />;
+  else if (path === "/final-year-project-help") page = <FinalYearProjectPage />;
+  else {
+    const branchMatch = Object.entries(branchSeoContent).find(([, c]) => c.path === path);
+    const serviceMatch = Object.entries(serviceSeoPages).find(([, c]) => c.path === path);
+    if (branchMatch) page = <BranchSeoPage branchId={branchMatch[0]} />;
+    else if (serviceMatch) page = <ServiceSeoPage slug={serviceMatch[0]} />;
+    else page = <Landing />;
+  }
 
-  const serviceMatch = Object.entries(serviceSeoPages).find(([, c]) => c.path === path);
-  if (serviceMatch) return <ServiceSeoPage slug={serviceMatch[0]} />;
-
-  return <Landing />;
+  return (
+    <>
+      {page}
+      {path !== "/" && <FloatingWhatsApp />}
+    </>
+  );
 }
