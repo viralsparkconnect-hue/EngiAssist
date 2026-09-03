@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Founding Batch | EngiAssist</title>
+<meta name="description" content="EngiAssist's Founding Batch — limited-seat launch offer for engineering final year & mini project help across CS, Mechanical, Civil, Electronics, AI/ML and Chemical." />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Unbounded:wght@600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+  /* ============================================================
+     EDITABLE BRAND TOKENS — pulled directly from the main
+     EngiAssist site (app/src/index.css) so this page matches.
+     ============================================================ */
+  :root {
+    --bg: #040812;
+    --bg2: #080f1e;
+    --surface: #0d1730;
+    --surface2: #111e38;
+    --border: rgba(255,255,255,0.07);
+    --text: #e8edf5;
+    --muted: #6b7fa3;
+    --accent: #00f5ff;
+    --accent2: #7c6fff;
+    --gold: #ffbe3d;
+    --radius: 16px;
+    --shadow: 0 8px 40px rgba(0,0,0,0.5);
+  }
+
+  * , *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  img, svg { display: block; max-width: 100%; }
+  a { color: inherit; }
+
+  h1, h2, h3 { font-family: 'Unbounded', sans-serif; color: #fff; }
+
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 5%; }
+
+  /* ─── Top bar ─── */
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 5%;
+    background: rgba(4,8,18,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+  .brand { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; }
+  .brand .logo-icon { font-size: 1.4rem; }
+  .brand-name { font-family: 'Unbounded', sans-serif; font-weight: 800; font-size: 1.15rem; color: #fff; }
+  .brand-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff; font-size: 0.6rem; font-weight: 700; padding: 2px 7px;
+    border-radius: 99px; letter-spacing: 1px;
+  }
+  .topbar-links { display: flex; align-items: center; gap: 1.4rem; }
+  .topbar-links a {
+    font-size: 0.85rem; font-weight: 600; color: var(--muted); text-decoration: none;
+    transition: color 0.2s;
+  }
+  .topbar-links a:hover { color: #fff; }
+
+  /* ─── Section common ─── */
+  section { padding: 5rem 5%; }
+  .tag {
+    display: inline-block;
+    background: rgba(124,111,255,0.12);
+    border: 1px solid rgba(124,111,255,0.3);
+    color: var(--accent2);
+    font-size: 0.72rem; font-weight: 700;
+    padding: 0.3rem 0.9rem;
+    border-radius: 99px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 1.1rem;
+  }
+  .tag.gold { color: var(--gold); background: rgba(255,190,61,0.12); border-color: rgba(255,190,61,0.3); }
+
+  /* ─── Hero ─── */
+  .hero { text-align: center; padding-top: 4.5rem; position: relative; }
+  .hero::before {
+    content: ''; position: absolute; inset: 0; z-index: -1;
+    background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(0,245,255,0.10), transparent 70%);
+  }
+  .hero h1 {
+    font-size: clamp(2.1rem, 5vw, 3.4rem);
+    font-weight: 800; line-height: 1.15;
+    max-width: 780px; margin: 0 auto 1.1rem;
+  }
+  .hero p.sub {
+    color: var(--muted); font-size: 1.05rem;
+    max-width: 560px; margin: 0 auto 2.6rem;
+  }
+
+  /* Countdown — the one bold visual moment on this page */
+  .countdown {
+    display: flex; justify-content: center; gap: 0.9rem; flex-wrap: wrap;
+    margin: 0 auto 1.8rem;
+  }
+  .cd-unit {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.3rem;
+    min-width: 84px;
+    box-shadow: 0 0 40px rgba(0,245,255,0.08);
+  }
+  .cd-num {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .cd-label { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 0.15rem; }
+
+  .seats-wrap { max-width: 380px; margin: 0 auto 2.4rem; }
+  .seats-label { display: flex; justify-content: space-between; font-size: 0.82rem; color: var(--muted); margin-bottom: 0.5rem; }
+  .seats-label strong { color: var(--gold); font-weight: 700; }
+  .seats-bar { height: 8px; border-radius: 99px; background: var(--surface2); overflow: hidden; border: 1px solid var(--border); }
+  .seats-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--accent2), var(--gold)); }
+
+  .hero-btns { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
+  .btn-primary, .btn-submit {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff; border: none; padding: 0.9rem 2.1rem;
+    border-radius: var(--radius); font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1rem; font-weight: 700; cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 0 30px rgba(0,245,255,0.3);
+  }
+  .btn-primary:hover, .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 0 50px rgba(0,245,255,0.5); }
+  .btn-secondary {
+    background: var(--surface); color: var(--text); border: 1px solid var(--border);
+    padding: 0.9rem 2.1rem; border-radius: var(--radius);
+    font-size: 1rem; font-weight: 600; cursor: pointer; text-decoration: none;
+    display: inline-flex; align-items: center; transition: all 0.2s;
+  }
+  .btn-secondary:hover { background: var(--surface2); border-color: rgba(255,255,255,0.15); transform: translateY(-2px); }
+
+  /* ─── What's included ─── */
+  .included-section { background: var(--bg2); }
+  .section-head { text-align: center; max-width: 560px; margin: 0 auto 3rem; }
+  .section-head h2 { font-size: clamp(1.7rem, 3vw, 2.3rem); font-weight: 800; margin-bottom: 0.6rem; }
+  .section-head p { color: var(--muted); }
+
+  .included-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; }
+  .included-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 1.6rem 1.4rem;
+  }
+  .included-card .ic { font-size: 1.6rem; margin-bottom: 0.7rem; }
+  .included-card h3 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; color: #fff; }
+  .included-card p { font-size: 0.87rem; color: var(--muted); }
+
+  /* ─── Branches strip ─── */
+  .branches-strip { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.8rem; margin-top: 2.6rem; }
+  .branch-chip {
+    display: flex; align-items: center; gap: 0.5rem;
+    background: var(--surface); border: 1px solid var(--border);
+    padding: 0.6rem 1.1rem; border-radius: 99px; font-size: 0.85rem; font-weight: 600;
+    cursor: pointer; transition: border-color 0.2s, transform 0.2s;
+  }
+  .branch-chip:hover { transform: translateY(-2px); }
+
+  /* ─── Offer / pricing card ─── */
+  .offer-section { display: flex; justify-content: center; }
+  .offer-card {
+    max-width: 640px; width: 100%;
+    background: linear-gradient(180deg, var(--surface), var(--surface2));
+    border: 1px solid rgba(255,190,61,0.25);
+    border-radius: 20px; padding: 2.4rem;
+    box-shadow: var(--shadow);
+    position: relative;
+  }
+  .offer-card::before {
+    content: 'LIMITED TO FIRST 30 STUDENTS';
+    position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+    background: var(--gold); color: #1a1400; font-size: 0.68rem; font-weight: 800;
+    letter-spacing: 1px; padding: 0.35rem 1rem; border-radius: 99px;
+  }
+  .price-row { display: flex; align-items: baseline; justify-content: center; gap: 0.9rem; margin: 1.6rem 0 0.3rem; }
+  .price-old { font-size: 1.3rem; color: var(--muted); text-decoration: line-through; }
+  .price-new { font-family: 'Unbounded', sans-serif; font-size: 2.6rem; font-weight: 800; color: var(--gold); }
+  .price-note { text-align: center; color: var(--muted); font-size: 0.85rem; margin-bottom: 2rem; }
+  .offer-terms { list-style: none; display: flex; flex-direction: column; gap: 0.85rem; }
+  .offer-terms li { display: flex; gap: 0.7rem; font-size: 0.92rem; color: var(--text); }
+  .offer-terms li .dot { color: var(--accent); flex-shrink: 0; }
+  .offer-terms strong { color: #fff; }
+
+  .referral-note {
+    margin-top: 1.8rem; padding: 1rem 1.2rem; border-radius: 12px;
+    background: rgba(124,111,255,0.08); border: 1px solid rgba(124,111,255,0.25);
+    font-size: 0.87rem; color: var(--text);
+  }
+  .referral-note strong { color: var(--accent2); }
+  .referral-code-row {
+    display: flex; align-items: center; gap: 0.7rem; margin-top: 0.8rem; flex-wrap: wrap;
+  }
+  .referral-code-label { font-size: 0.82rem; color: var(--muted); }
+  .referral-code-chip {
+    display: flex; align-items: center; gap: 0.6rem;
+    background: var(--bg2); border: 1px dashed rgba(0,245,255,0.4);
+    border-radius: 10px; padding: 0.4rem 0.6rem 0.4rem 0.9rem;
+    cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+  .referral-code-chip:hover { border-color: var(--accent); }
+  #referral-code-text {
+    font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 0.85rem;
+    letter-spacing: 0.5px; color: var(--accent);
+  }
+  .referral-copied {
+    font-size: 0.7rem; font-weight: 700; color: var(--bg);
+    background: var(--accent); padding: 0.25rem 0.55rem; border-radius: 6px;
+  }
+
+  /* ─── Trust bullets ─── */
+  .trust-section { background: var(--bg2); }
+  .trust-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.4rem; text-align: center; max-width: 900px; margin: 0 auto; }
+  .trust-item .ti-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+  .trust-item p { font-size: 0.85rem; color: var(--muted); }
+
+  /* ─── Form ─── */
+  .form-section { background: var(--bg); }
+  .form-card {
+    max-width: 640px; margin: 0 auto;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; padding: 2.2rem;
+  }
+  .contact-form { display: flex; flex-direction: column; gap: 1rem; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .contact-form label { font-size: 0.78rem; color: var(--muted); margin-bottom: 0.3rem; display: block; }
+  .contact-form input, .contact-form select, .contact-form textarea {
+    background: var(--bg2); border: 1px solid var(--border); color: var(--text);
+    padding: 0.8rem 1rem; border-radius: 12px; font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.9rem; width: 100%; outline: none; transition: border-color 0.2s;
+  }
+  .contact-form input:focus, .contact-form select:focus, .contact-form textarea:focus { border-color: var(--accent); }
+  .contact-form input::placeholder, .contact-form textarea::placeholder { color: var(--muted); }
+  .contact-form select option { background: var(--surface); }
+  .contact-form input[type="date"] { color-scheme: dark; }
+  .contact-form textarea { resize: vertical; min-height: 90px; }
+  .form-hint { font-size: 0.78rem; color: var(--muted); text-align: center; }
+  .form-success {
+    text-align: center; padding: 1rem;
+  }
+  .form-success .fs-code { font-size: 1.1rem; letter-spacing: 0.03em; color: var(--accent); font-weight: 700; }
+  .form-error { font-size: 0.82rem; color: #ff6b6b; text-align: center; }
+
+  /* ─── Footer ─── */
+  footer {
+    padding: 2.5rem 5%; text-align: center;
+    border-top: 1px solid var(--border);
+    color: var(--muted); font-size: 0.85rem;
+  }
+  .footer-links { display: flex; justify-content: center; gap: 1.4rem; margin-bottom: 1rem; flex-wrap: wrap; }
+  .footer-links a { text-decoration: none; color: var(--text); font-weight: 600; font-size: 0.85rem; }
+  .footer-links a:hover { color: var(--accent); }
+
+  @media (max-width: 780px) {
+    .included-grid { grid-template-columns: 1fr 1fr; }
+    .trust-grid { grid-template-columns: 1fr 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    .topbar-links span.hide-mobile { display: none; }
+  }
+  @media (max-width: 480px) {
+    .included-grid { grid-template-columns: 1fr; }
+    .cd-unit { min-width: 68px; padding: 0.8rem 0.9rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ═══ TOP BAR ═══ -->
+  <div class="topbar">
+    <a class="brand" href="https://www.engiassist.in">
+      <span class="logo-icon">⚡</span>
+      <span class="brand-name">EngiAssist</span>
+      <span class="brand-badge">PRO</span>
+    </a>
+    <div class="topbar-links">
+      <span class="hide-mobile" style="color:var(--muted); font-size:0.85rem;">Back to</span>
+      <a href="https://www.engiassist.in">engiassist.in</a>
+    </div>
+  </div>
+
+  <!-- ═══ HERO ═══ -->
+  <section class="hero">
+    <div class="wrap">
+      <span class="tag gold">Founding Batch — Now Open</span>
+      <h1>We're taking on our first 30 students. Yours could be one of them.</h1>
+      <p class="sub">Get full project support — idea to viva — at Founding Batch pricing, in exchange for being one of our first case studies. Once 30 seats are filled or the timer hits zero, this offer closes for good.</p>
+
+      <div class="countdown" id="countdown" aria-live="polite">
+        <div class="cd-unit"><div class="cd-num" id="cd-days">--</div><div class="cd-label">Days</div></div>
+        <div class="cd-unit"><div class="cd-num" id="cd-hours">--</div><div class="cd-label">Hours</div></div>
+        <div class="cd-unit"><div class="cd-num" id="cd-mins">--</div><div class="cd-label">Mins</div></div>
+        <div class="cd-unit"><div class="cd-num" id="cd-secs">--</div><div class="cd-label">Secs</div></div>
+      </div>
+
+      <div class="seats-wrap">
+        <div class="seats-label"><span>Seats claimed</span><strong id="seats-text">-- / --</strong></div>
+        <div class="seats-bar"><div class="seats-fill" id="seats-fill" style="width:0%"></div></div>
+      </div>
+
+      <div class="hero-btns">
+        <button class="btn-primary" onclick="document.getElementById('claim-form').scrollIntoView({behavior:'smooth'})">Claim My Seat →</button>
+        <a class="btn-secondary" href="#included">See what's included</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ WHAT'S INCLUDED ═══ -->
+  <section class="included-section" id="included">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="tag">The Founding Batch Package</span>
+        <h2>Everything for your project, in one package</h2>
+        <p>No separate charges for each piece — this is the full bundle every Founding Batch student gets.</p>
+      </div>
+      <div class="included-grid">
+        <div class="included-card">
+          <div class="ic">🎯</div>
+          <h3>Topic finalization</h3>
+          <p>1:1 help choosing a project your guide will actually approve — matched to your branch and skill level.</p>
+        </div>
+        <div class="included-card">
+          <div class="ic">🖥️</div>
+          <h3>Working model / code</h3>
+          <p>A functioning build — source code, circuit, or CAD/model depending on your branch — not just a report.</p>
+        </div>
+        <div class="included-card">
+          <div class="ic">📋</div>
+          <h3>Full documentation</h3>
+          <p>IEEE-format report, abstract, and diagrams, ready to submit to your department.</p>
+        </div>
+        <div class="included-card">
+          <div class="ic">📊</div>
+          <h3>PPT & presentation</h3>
+          <p>A clean, review-ready slide deck built around your actual project.</p>
+        </div>
+        <div class="included-card">
+          <div class="ic">🎤</div>
+          <h3>Viva prep</h3>
+          <p>We walk you through likely questions so you can explain your own project with confidence.</p>
+        </div>
+        <div class="included-card">
+          <div class="ic">💬</div>
+          <h3>Direct WhatsApp support</h3>
+          <p>Stuck at 11pm before a deadline? Message us directly — no ticket queues.</p>
+        </div>
+      </div>
+
+      <div class="branches-strip">
+        <div class="branch-chip" style="border-color: rgba(0,245,255,0.35)"><span>💻</span> Computer Science</div>
+        <div class="branch-chip" style="border-color: rgba(255,149,0,0.35)"><span>⚙️</span> Mechanical</div>
+        <div class="branch-chip" style="border-color: rgba(76,217,100,0.35)"><span>🏗️</span> Civil</div>
+        <div class="branch-chip" style="border-color: rgba(255,45,85,0.35)"><span>⚡</span> Electronics</div>
+        <div class="branch-chip" style="border-color: rgba(175,82,222,0.35)"><span>🌐</span> IT / AI &amp; ML</div>
+        <div class="branch-chip" style="border-color: rgba(255,204,0,0.35)"><span>🧪</span> Chemical</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ OFFER / PRICING ═══ -->
+  <section class="offer-section">
+    <div class="offer-card">
+      <div class="section-head" style="margin-bottom:0.5rem;">
+        <span class="tag">Founding Batch Offer</span>
+        <h2 style="font-size:1.6rem;">One price. The full bundle.</h2>
+      </div>
+      <div class="price-row">
+        <span class="price-old" id="price-old">₹[REGULAR PRICE]</span>
+        <span class="price-new" id="price-new">₹[FOUNDING PRICE]</span>
+      </div>
+      <p class="price-note">One-time — covers everything listed above, start to viva. <span id="discount-label">[XX]% off</span> the regular price, only for the first 30 students.</p>
+
+      <ul class="offer-terms">
+        <li><span class="dot">◆</span><span><strong>Limited to 30 seats</strong> — once filled, Founding Batch pricing closes, no exceptions.</span></li>
+        <li><span class="dot">◆</span><span><strong>Ends <span id="deadline-text">[DATE]</span></strong> — whichever comes first, seats or deadline.</span></li>
+        <li><span class="dot">◆</span><span>In return, we ask for a short testimonial (text or video) once your project is delivered.</span></li>
+        <li><span class="dot">◆</span><span>Free 10-minute WhatsApp consult before you commit to anything — no pressure, no payment needed to ask questions.</span></li>
+      </ul>
+
+      <div class="referral-note">
+        <strong>Refer a friend</strong> who joins the Founding Batch and you both get ₹[REFERRAL AMOUNT] off — stacks with your seat, no limit on referrals.
+        <div class="referral-code-row">
+          <span class="referral-code-label">Share this code:</span>
+          <button type="button" class="referral-code-chip" id="referral-code-chip" onclick="copyReferralCode()">
+            <span id="referral-code-text">[CODE]</span>
+            <span id="referral-code-copied" class="referral-copied">Copy</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ TRUST ═══ -->
+  <section class="trust-section">
+    <div class="wrap">
+      <div class="trust-grid">
+        <div class="trust-item"><div class="ti-icon">🎓</div><p>All 6 engineering branches covered</p></div>
+        <div class="trust-item"><div class="ti-icon">🛠️</div><p>Working model, not just a report</p></div>
+        <div class="trust-item"><div class="ti-icon">💬</div><p>Direct WhatsApp access, no call centre</p></div>
+        <div class="trust-item"><div class="ti-icon">🕒</div><p>Support until your viva is done</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FORM ═══ -->
+  <section class="form-section" id="claim-form">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="tag gold">Last Step</span>
+        <h2>Claim your Founding Batch seat</h2>
+        <p>Fill this in — we'll confirm your seat over WhatsApp within the day.</p>
+      </div>
+
+      <div class="form-card">
+        <form class="contact-form" id="lead-form">
+          <div class="form-row">
+            <div>
+              <label for="f-name">Full name *</label>
+              <input id="f-name" name="name" type="text" placeholder="Your name" required />
+            </div>
+            <div>
+              <label for="f-phone">Phone / WhatsApp *</label>
+              <input id="f-phone" name="phone" type="tel" placeholder="10-digit number" required />
+            </div>
+          </div>
+          <div class="form-row">
+            <div>
+              <label for="f-email">Email *</label>
+              <input id="f-email" name="email" type="email" placeholder="you@email.com" required />
+            </div>
+            <div>
+              <label for="f-branch">Branch *</label>
+              <select id="f-branch" name="branch" required>
+                <option value="cs">💻 Computer Science</option>
+                <option value="mech">⚙️ Mechanical</option>
+                <option value="civil">🏗️ Civil</option>
+                <option value="elec">⚡ Electronics</option>
+                <option value="it">🌐 IT / AI &amp; ML</option>
+                <option value="chem">🧪 Chemical</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div>
+              <label for="f-semester">Semester</label>
+              <input id="f-semester" name="semester" type="text" placeholder="e.g. 7th" />
+            </div>
+            <div>
+              <label for="f-status">Current status</label>
+              <select id="f-status" name="projectStatus">
+                <option value="">Select status</option>
+                <option value="idea">Only Idea</option>
+                <option value="started">Started</option>
+                <option value="partial">Partially Completed</option>
+                <option value="almost">Almost Completed</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label for="f-project">Project topic (if you have one)</label>
+            <input id="f-project" name="project" type="text" placeholder="e.g. Smart attendance system" />
+          </div>
+          <div class="form-row">
+            <div>
+              <label for="f-deadline">Submission deadline</label>
+              <input id="f-deadline" name="deadline" type="date" />
+            </div>
+            <div>
+              <label for="f-referrer">Referral code (optional)</label>
+              <input id="f-referrer" name="referrer" type="text" placeholder="e.g. ENGI30" />
+            </div>
+          </div>
+          <div>
+            <label for="f-message">Anything else we should know?</label>
+            <textarea id="f-message" name="message" placeholder="Your message..."></textarea>
+          </div>
+
+          <button type="submit" class="btn-submit" id="submit-btn">Claim My Founding Batch Seat →</button>
+          <p class="form-hint">We'll also open WhatsApp so you can send this directly — no seat is confirmed until we reply.</p>
+          <p class="form-error" id="form-error" style="display:none;"></p>
+        </form>
+
+        <div class="form-success" id="form-success" style="display:none;">
+          <h3 style="margin-bottom:0.6rem;">Request received 🎉</h3>
+          <p style="color:var(--muted); margin-bottom:0.8rem;">Your reference: <span class="fs-code" id="fs-code"></span></p>
+          <p style="color:var(--muted); font-size:0.9rem;">We've opened WhatsApp with your details pre-filled — hit send there and we'll confirm your seat.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer>
+    <div class="footer-links">
+      <a href="https://www.engiassist.in">Website</a>
+      <a href="https://www.instagram.com/engiassist/" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://www.linkedin.com/in/engi-assist-850926385/" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://wa.me/919021698707" target="_blank" rel="noopener">WhatsApp</a>
+    </div>
+    <p>⚡ EngiAssist — Founding Batch offer. Seats and pricing as shown above.</p>
+  </footer>
+
+<script>
+  /* ============================================================
+     EDIT THIS BLOCK — everything a founder needs to change to
+     launch or update the offer lives here in one place.
+     ============================================================ */
+  const CONFIG = {
+    // ISO date/time the Founding Batch offer closes (local time).
+    DEADLINE_ISO: "2026-10-04T23:59:59",
+
+    // Total Founding Batch seats and how many are already claimed.
+    // Update SEATS_CLAIMED manually as you close deals — this is
+    // intentionally not automatic, so the number is always honest.
+    TOTAL_SEATS: 30,
+    SEATS_CLAIMED: 0,
+
+    // Pricing — replace with your real numbers before publishing.
+    REGULAR_PRICE: "₹6,999",
+    FOUNDING_PRICE: "₹4,499",
+    DISCOUNT_LABEL: "35% off",
+    REFERRAL_AMOUNT: "500",
+    REFERRAL_CODE: "ENGI30",
+
+    // Same WhatsApp number the main site uses.
+    WHATSAPP_NUMBER: "919021698707",
+
+    // Supabase project — same one the main EngiAssist site uses,
+    // so leads from this page land in the same /dashboard.
+    SUPABASE_URL: "https://rgebwdjklduowelmiphd.supabase.co",
+    SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJnZWJ3ZGprbGR1b3dlbG1pcGhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwMjI0MDgsImV4cCI6MjEwMzU5ODQwOH0.QJVXumptRy0QJG5WncF16sLR0x7Poou4yKjtAab9gM8"
+  };
+
+  // ── Render price/discount/deadline text from CONFIG ──
+  document.getElementById('price-old').textContent = CONFIG.REGULAR_PRICE;
+  document.getElementById('price-new').textContent = CONFIG.FOUNDING_PRICE;
+  document.getElementById('discount-label').textContent = CONFIG.DISCOUNT_LABEL;
+  document.getElementById('deadline-text').textContent = new Date(CONFIG.DEADLINE_ISO).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+  document.querySelector('.referral-note').innerHTML =
+    `<strong>Refer a friend</strong> who joins the Founding Batch and you both get ₹${CONFIG.REFERRAL_AMOUNT} off — stacks with your seat, no limit on referrals.
+    <div class="referral-code-row">
+      <span class="referral-code-label">Share this code:</span>
+      <button type="button" class="referral-code-chip" id="referral-code-chip" onclick="copyReferralCode()">
+        <span id="referral-code-text">${CONFIG.REFERRAL_CODE}</span>
+        <span id="referral-code-copied" class="referral-copied">Copy</span>
+      </button>
+    </div>`;
+
+  function copyReferralCode() {
+    navigator.clipboard.writeText(CONFIG.REFERRAL_CODE).then(() => {
+      const el = document.getElementById('referral-code-copied');
+      el.textContent = 'Copied!';
+      setTimeout(() => { el.textContent = 'Copy'; }, 1800);
+    }).catch(() => {});
+  }
+
+  // Pre-fill the referral field if someone arrives via ?ref=CODE or ?code=CODE
+  const urlParams = new URLSearchParams(window.location.search);
+  const incomingCode = urlParams.get('ref') || urlParams.get('code');
+  if (incomingCode) {
+    const refField = document.getElementById('f-referrer');
+    if (refField) refField.value = incomingCode;
+  }
+
+  // ── Seats bar ──
+  const seatsLeft = Math.max(CONFIG.TOTAL_SEATS - CONFIG.SEATS_CLAIMED, 0);
+  document.getElementById('seats-text').textContent = `${CONFIG.SEATS_CLAIMED} / ${CONFIG.TOTAL_SEATS}`;
+  document.getElementById('seats-fill').style.width = `${Math.min((CONFIG.SEATS_CLAIMED / CONFIG.TOTAL_SEATS) * 100, 100)}%`;
+
+  // ── Live countdown ──
+  function updateCountdown() {
+    const deadline = new Date(CONFIG.DEADLINE_ISO).getTime();
+    const now = Date.now();
+    const diff = deadline - now;
+    const el = document.getElementById('countdown');
+    if (diff <= 0) {
+      el.innerHTML = '<div class="cd-unit" style="min-width:auto; padding:1rem 1.6rem;"><div class="cd-label" style="font-size:0.9rem; color:var(--gold);">Founding Batch offer has closed</div></div>';
+      return;
+    }
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    document.getElementById('cd-days').textContent = String(d).padStart(2, '0');
+    document.getElementById('cd-hours').textContent = String(h).padStart(2, '0');
+    document.getElementById('cd-mins').textContent = String(m).padStart(2, '0');
+    document.getElementById('cd-secs').textContent = String(s).padStart(2, '0');
+  }
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  // ── Supabase client (same table the main site writes to) ──
+  let supabase = null;
+  try {
+    if (window.supabase && CONFIG.SUPABASE_URL && CONFIG.SUPABASE_ANON_KEY) {
+      supabase = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+    }
+  } catch (err) {
+    console.warn('[EngiAssist] Supabase client failed to init:', err);
+  }
+
+  function makeLeadCode() {
+    const n = Date.now().toString().slice(-6);
+    return `FB-${n}`; // FB prefix marks this lead as a Founding Batch signup
+  }
+
+  const branchLabels = {
+    cs: "Computer Science", mech: "Mechanical", civil: "Civil",
+    elec: "Electronics", it: "IT / AI & ML", chem: "Chemical",
+  };
+  const statusLabels = {
+    idea: "Only Idea", started: "Started",
+    partial: "Partially Completed", almost: "Almost Completed",
+  };
+
+  document.getElementById('lead-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('submit-btn');
+    const errorEl = document.getElementById('form-error');
+    errorEl.style.display = 'none';
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
+
+    const form = e.target;
+    const data = {
+      name: form.name.value.trim(),
+      phone: form.phone.value.trim(),
+      email: form.email.value.trim(),
+      branch: form.branch.value,
+      semester: form.semester.value.trim(),
+      project: form.project.value.trim(),
+      projectStatus: form.projectStatus.value,
+      deadline: form.deadline.value,
+      referrer: form.referrer.value.trim(),
+      message: form.message.value.trim(),
+    };
+
+    if (!data.name || !data.phone || !data.email || !data.branch) {
+      errorEl.textContent = 'Please fill in your name, phone, email and branch.';
+      errorEl.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Claim My Founding Batch Seat →';
+      return;
+    }
+
+    const code = makeLeadCode();
+    const branchName = branchLabels[data.branch] || data.branch;
+    const statusLabel = statusLabels[data.projectStatus] || 'Not specified';
+
+    // Save the lead into the same Supabase table the main site uses,
+    // tagged as a Founding Batch signup. If this fails (offline etc.)
+    // we still let the student reach us on WhatsApp below.
+    if (supabase) {
+      try {
+        const { error: insertError } = await supabase.from('leads').insert([{
+          name: data.name,
+          phone: data.phone,
+          email: data.email,
+          branch: data.branch,
+          semester: data.semester,
+          project: data.project,
+          project_status: data.projectStatus || null,
+          deadline: data.deadline || null,
+          message: `[FOUNDING BATCH OFFER]${data.referrer ? ' Referral code: ' + data.referrer + '.' : ''} ${data.message}`.trim(),
+          lead_code: code,
+        }]);
+        if (insertError) console.error('Lead save failed:', insertError.message);
+      } catch (err) {
+        console.error('Lead save failed:', err);
+      }
+    }
+
+    const waMessage = `Hello EngiAssist!
+
+FOUNDING BATCH REQUEST (Ref: ${code})
+
+Name: ${data.name}
+Phone: ${data.phone}
+Email: ${data.email}
+Branch: ${branchName}
+Semester: ${data.semester || 'Not specified'}
+Project: ${data.project || 'Not specified'}
+Current Status: ${statusLabel}
+Deadline: ${data.deadline || 'Not specified'}
+${data.referrer ? 'Referral code: ' + data.referrer + '\n' : ''}
+Message:
+${data.message || 'No message provided'}
+
+I'd like to claim a Founding Batch seat.`;
+
+    const whatsappUrl = `https://wa.me/${CONFIG.WHATSAPP_NUMBER}?text=${encodeURIComponent(waMessage)}`;
+    window.open(whatsappUrl, '_blank');
+
+    document.getElementById('lead-form').style.display = 'none';
+    document.getElementById('fs-code').textContent = code;
+    document.getElementById('form-success').style.display = 'block';
+  });
+</script>
+
+</body>
+</html>
