@@ -61,13 +61,14 @@ const services = [
   { icon: "🎓", title: "Mini & Major Projects", desc: "From simple mini projects to full major project builds" },
   { icon: "🖥️", title: "Code & Design", desc: "Working source code, circuit diagrams, and CAD files" },
   { icon: "📊", title: "PPT & Presentation", desc: "Professional presentations with content and design" },
+  { icon: "🎯", title: "Career & Placement Guidance", desc: "Practical support for resumes, interviews, internships, placements, and your engineering career" },
 ];
 
 const stats = [
-  { num: "10,000+", label: "Students Helped" },
-  { num: "500+", label: "Project Topics" },
-  { num: "6+", label: "Engineering Branches" },
-  { num: "98%", label: "Success Rate" },
+  { num: "🛠️", label: "Practical Engineering Support" },
+  { num: "💡", label: "Project Ideas & Guidance" },
+  { num: "🏛️", label: "Multiple Engineering Branches" },
+  { num: "🎓", label: "Built for Students" },
 ];
 
 const howItWorksSteps = [
@@ -170,54 +171,6 @@ function useReveal() {
   }, []);
 
   return [ref, visible];
-}
-
-function CountUp({ value }) {
-  const ref = useRef(null);
-  const [display, setDisplay] = useState("0");
-  const [started, setStarted] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setStarted(true);
-          obs.unobserve(el);
-        }
-      },
-      { threshold: 0.5 }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
-
-  useEffect(() => {
-    if (!started) return;
-    const match = value.match(/^([\d,]+)(.*)$/);
-    if (!match) {
-      setDisplay(value);
-      return;
-    }
-    const target = parseInt(match[1].replace(/,/g, ""), 10);
-    const suffix = match[2];
-    const duration = 1400;
-    const startTime = performance.now();
-    let raf;
-    const tick = (now) => {
-      const progress = Math.min((now - startTime) / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      const current = Math.floor(eased * target);
-      setDisplay(current.toLocaleString() + suffix);
-      if (progress < 1) raf = requestAnimationFrame(tick);
-      else setDisplay(target.toLocaleString() + suffix);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [started, value]);
-
-  return <span ref={ref}>{display}</span>;
 }
 
 function TrustStrip() {
@@ -361,7 +314,7 @@ function Hero() {
         <div className="orb orb3"></div>
       </div>
       <div className="hero-content">
-        <div className="hero-badge">🎓 India's #1 Engineering Student Portal</div>
+        <div className="hero-badge">🎓 Engineering Help, Made Simple</div>
         <h1 className="hero-title">
           Your Ultimate Guide for<br />
           <span className="typed-line">
@@ -370,8 +323,8 @@ function Hero() {
           </span>
         </h1>
         <p className="hero-sub">
-          From CS to Civil, Mechanical to Electronics — we help every engineering student
-          build outstanding projects, write perfect reports, and ace their academics.
+          Explore project ideas, get guidance, and find useful resources for your
+          engineering journey.
         </p>
         <div className="hero-btns">
           <button
@@ -390,7 +343,7 @@ function Hero() {
         <div className="hero-stats">
           {stats.map((s) => (
             <div key={s.label} className="stat-chip">
-              <span className="stat-num"><CountUp value={s.num} /></span>
+              <span className="stat-num">{s.num}</span>
               <span className="stat-label">{s.label}</span>
             </div>
           ))}
