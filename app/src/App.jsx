@@ -665,14 +665,14 @@ function AboutPage() {
           <div className="orb orb1"></div>
           <div className="orb orb2"></div>
         </div>
-        <Reveal className="about-hero-content">
+        <div className="about-hero-content">
           <span className="hero-badge">🎓 The Story Behind EngiAssist</span>
           <h1 className="about-hero-title">About EngiAssist</h1>
           <p className="hero-sub">
             Built by an engineer who understands exactly what students need —
             not just a finished project, but real understanding.
           </p>
-        </Reveal>
+        </div>
       </section>
       <AboutUs />
       <Testimonials />
@@ -1032,12 +1032,12 @@ function BranchSeoPage({ branchId }) {
           <div className="orb orb1"></div>
           <div className="orb orb2"></div>
         </div>
-        <Reveal className="about-hero-content">
+        <div className="about-hero-content">
           <div className="seo-icon-badge" style={{ "--accent": branch.color }}>{branch.icon}</div>
           <span className="hero-badge">{branch.icon} {branch.label}</span>
           <h1 className="about-hero-title">{branch.label} Project Assistance</h1>
           <p className="hero-sub">{branch.desc}</p>
-        </Reveal>
+        </div>
       </section>
       <section className="seo-body">
         <Reveal className="seo-body-inner">
@@ -1135,12 +1135,12 @@ function ServiceSeoPage({ slug }) {
           <div className="orb orb1"></div>
           <div className="orb orb2"></div>
         </div>
-        <Reveal className="about-hero-content">
+        <div className="about-hero-content">
           <div className="seo-icon-badge">{content.icon}</div>
           <span className="hero-badge">🎓 Engineering Project Support</span>
           <h1 className="about-hero-title">{content.heading}</h1>
           <p className="hero-sub">{content.intro}</p>
-        </Reveal>
+        </div>
       </section>
       <section className="fix-section">
         <Reveal className="fix-wrapper" delay={100}>
@@ -1178,7 +1178,7 @@ function FinalYearProjectPage() {
           <div className="orb orb1"></div>
           <div className="orb orb2"></div>
         </div>
-        <Reveal className="about-hero-content">
+        <div className="about-hero-content">
           <div className="seo-icon-badge">🎓</div>
           <span className="hero-badge">🎓 Final Year Project Assistance</span>
           <h1 className="about-hero-title">Final Year Project Help, Start to Submission</h1>
@@ -1186,7 +1186,7 @@ function FinalYearProjectPage() {
             From choosing a topic to building it, documenting it and defending it in your viva —
             support for B.Tech, BE and Diploma students across every engineering branch.
           </p>
-        </Reveal>
+        </div>
       </section>
       <Branches />
       <HowItWorks />
