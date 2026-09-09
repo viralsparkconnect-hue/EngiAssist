@@ -231,7 +231,7 @@ body {
   font-size: 0.82rem;
   font-weight: 600;
   margin-bottom: 1.5rem;
-  animation: fadeUp 0.6s both;
+  animation: slideUp 0.6s both;
 }
 
 .hero-title {
@@ -241,7 +241,7 @@ body {
   line-height: 1.22;
   letter-spacing: -0.02em;
   margin-bottom: 1.2rem;
-  animation: fadeUp 0.6s 0.1s both;
+  animation: slideUp 0.6s 0.1s both;
   color: #fff;
 }
 
@@ -271,7 +271,7 @@ body {
   font-size: 1.05rem;
   max-width: 520px;
   margin-bottom: 2rem;
-  animation: fadeUp 0.6s 0.2s both;
+  animation: slideUp 0.6s 0.2s both;
 }
 
 .hero-btns {
@@ -279,7 +279,7 @@ body {
   gap: 1rem;
   flex-wrap: wrap;
   margin-bottom: 2.5rem;
-  animation: fadeUp 0.6s 0.3s both;
+  animation: slideUp 0.6s 0.3s both;
 }
 
 .btn-primary {
@@ -324,7 +324,7 @@ body {
   display: flex;
   gap: 1.5rem;
   flex-wrap: wrap;
-  animation: fadeUp 0.6s 0.4s both;
+  animation: slideUp 0.6s 0.4s both;
 }
 
 .stat-chip {
@@ -398,6 +398,15 @@ body {
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(24px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* Same slide-up motion as fadeUp, but never hides content at opacity:0.
+   Used on above-the-fold hero elements (including the LCP h1) so the
+   browser can paint them immediately instead of waiting ~0.6-0.7s for
+   an entrance animation to finish before counting them as painted. */
+@keyframes slideUp {
+  from { transform: translateY(24px); }
+  to { transform: translateY(0); }
 }
 
 /* ─── Section Common ─── */
@@ -1575,7 +1584,7 @@ section { padding: 6rem 5%; }
   flex-wrap: wrap;
   gap: 0.9rem 1.6rem;
   margin-top: 1.8rem;
-  animation: fadeUp 0.6s 0.5s both;
+  animation: slideUp 0.6s 0.5s both;
 }
 
 .trust-item {
