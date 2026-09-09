@@ -251,7 +251,12 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  min-height: 1.3em;
+  /* Reserve space for the tallest wrapped phrase (up to 2 lines) so the
+     typing/deleting animation never changes the hero's height — this was
+     causing continuous layout shift (CLS) throughout the time on page,
+     since it isn't a user-triggered shift and counts fully against CLS. */
+  min-height: calc(1.22em * 2);
+  overflow: hidden;
 }
 
 .cursor {
