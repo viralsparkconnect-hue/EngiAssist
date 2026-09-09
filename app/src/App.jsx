@@ -1,7 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import "./index.css";
-import { supabase } from "./lib/supabaseClient";
-import Dashboard from "./Dashboard";
+
+// Lazy-loaded: Dashboard (and the Supabase client it uses) should only be
+// downloaded by admins visiting /dashboard, not by every landing-page visitor.
+const Dashboard = lazy(() => import("./Dashboard"));
 
 const branches = [
   {
@@ -171,6 +173,29 @@ const testimonials = [
   },
 ];
 
+// A single shared IntersectionObserver serves every <Reveal>, instead of each
+// one creating its own — cuts down on setup/teardown work on the main thread.
+let sharedRevealObserver = null;
+const revealCallbacks = new WeakMap();
+
+function getSharedRevealObserver() {
+  if (sharedRevealObserver) return sharedRevealObserver;
+  sharedRevealObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const cb = revealCallbacks.get(entry.target);
+          if (cb) cb();
+          sharedRevealObserver.unobserve(entry.target);
+          revealCallbacks.delete(entry.target);
+        }
+      });
+    },
+    { threshold: 0.15 }
+  );
+  return sharedRevealObserver;
+}
+
 function useReveal() {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
@@ -178,17 +203,13 @@ function useReveal() {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          observer.unobserve(el);
-        }
-      },
-      { threshold: 0.15 }
-    );
+    const observer = getSharedRevealObserver();
+    revealCallbacks.set(el, () => setVisible(true));
     observer.observe(el);
-    return () => observer.disconnect();
+    return () => {
+      observer.unobserve(el);
+      revealCallbacks.delete(el);
+    };
   }, []);
 
   return [ref, visible];
@@ -231,13 +252,23 @@ function CursorGlow() {
 
   useEffect(() => {
     if (window.matchMedia("(pointer: coarse)").matches) return;
+    let frame = null;
+    let pending = null;
     const move = (e) => {
-      if (glowRef.current) {
-        glowRef.current.style.transform = `translate(${e.clientX - 200}px, ${e.clientY - 200}px)`;
-      }
+      pending = e;
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        if (glowRef.current && pending) {
+          glowRef.current.style.transform = `translate(${pending.clientX - 200}px, ${pending.clientY - 200}px)`;
+        }
+        frame = null;
+      });
     };
-    window.addEventListener("mousemove", move);
-    return () => window.removeEventListener("mousemove", move);
+    window.addEventListener("mousemove", move, { passive: true });
+    return () => {
+      window.removeEventListener("mousemove", move);
+      if (frame) cancelAnimationFrame(frame);
+    };
   }, []);
 
   return <div className="cursor-glow" ref={glowRef}></div>;
@@ -737,8 +768,10 @@ function Contact() {
     const code = makeLeadCode();
 
     // Save the lead so it shows up in /dashboard — if this fails (e.g. offline),
-    // we still let the student reach us on WhatsApp below.
+    // we still let the student reach us on WhatsApp below. Supabase is imported
+    // dynamically here so the landing page doesn't ship that code upfront.
     try {
+      const { supabase } = await import("./lib/supabaseClient");
       const { error: insertError } = await supabase.from("leads").insert([
         {
           name: form.name,
@@ -895,7 +928,6 @@ function Footer() {
           </div>
         </div>
         <p className="footer-copy">© 2026 EngiAssist. Built for engineering students. 🇮🇳</p>
-        <a className="footer-admin-link" href="/dashboard">Admin Login</a>
       </div>
     </footer>
   );
@@ -1247,7 +1279,13 @@ export default function App() {
       ? window.location.pathname.replace(/\/+$/, "") || "/"
       : "/";
 
-  if (path === "/dashboard") return <Dashboard />;
+  if (path === "/dashboard") {
+    return (
+      <Suspense fallback={<div className="dash-loading-screen">Loading dashboard…</div>}>
+        <Dashboard />
+      </Suspense>
+    );
+  }
 
   let page;
   if (path === "/about") page = <AboutPage />;
