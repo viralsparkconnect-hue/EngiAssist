@@ -7,7 +7,7 @@ import {
   Wrench, Lightbulb, Landmark,
   FileEdit, Handshake, PackageCheck,
   Lock, ShieldCheck, Bot, Mic,
-  TrendingUp, MapPin, Megaphone, CheckCircle2, ArrowRight, MessageCircle, ExternalLink,
+  TrendingUp, MapPin, Megaphone, CheckCircle2, ArrowRight, MessageCircle, ExternalLink, Mail,
 } from "lucide-react";
 
 // Lazy-loaded: Dashboard (and the Supabase client it uses) should only be
@@ -277,7 +277,7 @@ function Navbar({ active, setActive }) {
   return (
     <nav className={`navbar ${scrolled ? "scrolled" : ""}`}>
       <div className="nav-logo">
-        <span className="logo-icon"><Zap size={22} strokeWidth={2.4} /></span>
+        <img src="/logo.png" alt="EngiAssist logo" className="logo-icon-img" />
         <span className="logo-text">EngiAssist</span>
       </div>
       <ul className={`nav-links ${mobileOpen ? "open" : ""}`}>
@@ -847,6 +847,9 @@ Please contact me regarding my project.`;
             <span><Zap size={13} strokeWidth={2.2} /> Fast Delivery</span>
             <span><Lock size={13} strokeWidth={2.2} /> 100% Original</span>
           </div>
+          <a href="mailto:Contact@Engiassist.in" className="contact-email">
+            <Mail size={15} strokeWidth={2.2} /> Contact@Engiassist.in
+          </a>
         </div>
 
         {!submitted ? (
@@ -905,10 +908,13 @@ function Footer() {
     <footer className="footer">
       <div className="footer-inner">
         <div className="footer-brand">
-          <span className="logo-icon"><Zap size={20} strokeWidth={2.4} /></span>
+          <img src="/logo.png" alt="EngiAssist logo" className="logo-icon-img" />
           <span>EngiAssist</span>
         </div>
         <p>Empowering every engineering student to build, learn, and succeed.</p>
+        <a href="mailto:Contact@Engiassist.in" className="footer-email">
+          <Mail size={14} strokeWidth={2.2} /> Contact@Engiassist.in
+        </a>
         <div className="footer-links">
           <a href="/">Home</a>
           <a href="/#branches">Branches</a>
@@ -1323,7 +1329,11 @@ const legalPages = {
           messaging us on WhatsApp or emailing us with your request.
         </p>
         <h2>Contact</h2>
-        <p>Questions about this policy can be sent via the contact form on this site or on WhatsApp.</p>
+        <p>
+          Questions about this policy can be sent via the contact form on
+          this site, on WhatsApp, or by emailing{" "}
+          <a href="mailto:Contact@Engiassist.in">Contact@Engiassist.in</a>.
+        </p>
       </>
     ),
   },
@@ -1397,8 +1407,10 @@ const legalPages = {
         </p>
         <h2>How to Request a Refund</h2>
         <p>
-          Message us on WhatsApp or email with your reference ID and the
-          reason for your request. We aim to respond within 2 business days.
+          Message us on WhatsApp or email{" "}
+          <a href="mailto:Contact@Engiassist.in">Contact@Engiassist.in</a>{" "}
+          with your reference ID and the reason for your request. We aim to
+          respond within 2 business days.
         </p>
         <h2>Non-Refundable Situations</h2>
         <p>

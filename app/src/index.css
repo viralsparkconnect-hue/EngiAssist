@@ -69,6 +69,14 @@ body {
 
 .logo-icon { display: flex; color: var(--accent); }
 
+.logo-icon-img {
+  height: 34px;
+  width: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
 .logo-badge {
   background: linear-gradient(135deg, var(--accent), var(--accent2));
   color: #fff;
@@ -1106,6 +1114,20 @@ section { padding: 6rem 5%; }
 }
 
 .legal-page ul { padding-left: 1.3rem; }
+.legal-page a { color: var(--accent); text-decoration: underline; }
+
+.footer-email, .contact-email {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  margin: 0.4rem 0 0.75rem;
+}
+.footer-email:hover, .contact-email:hover { text-decoration: underline; }
+.contact-email { margin-top: 0.9rem; }
 
 /* ─── Responsive ─── */
 @media (max-width: 900px) {
