@@ -1,5 +1,14 @@
 import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import "./index.css";
+import {
+  Cpu, Cog, Building2, Zap, Globe, FlaskConical,
+  Rocket, ClipboardList, MessageCircleQuestion, GraduationCap,
+  MonitorSmartphone, BarChart3, Target,
+  Wrench, Lightbulb, Landmark,
+  FileEdit, Handshake, PackageCheck,
+  Lock, ShieldCheck, Bot, Mic,
+  TrendingUp, MapPin, Megaphone, CheckCircle2, ArrowRight, MessageCircle, ExternalLink,
+} from "lucide-react";
 
 // Lazy-loaded: Dashboard (and the Supabase client it uses) should only be
 // downloaded by admins visiting /dashboard, not by every landing-page visitor.
@@ -8,7 +17,7 @@ const Dashboard = lazy(() => import("./Dashboard"));
 const branches = [
   {
     id: "cs",
-    icon: "💻",
+    icon: Cpu,
     label: "Computer Science",
     color: "#00f5ff",
     desc: "Web dev, ML/AI, DSA, OS, DBMS, App Development",
@@ -16,7 +25,7 @@ const branches = [
   },
   {
     id: "mech",
-    icon: "⚙️",
+    icon: Cog,
     label: "Mechanical",
     color: "#ff9500",
     desc: "CAD designs, Thermodynamics, Fluid Mechanics, Robotics",
@@ -24,7 +33,7 @@ const branches = [
   },
   {
     id: "civil",
-    icon: "🏗️",
+    icon: Building2,
     label: "Civil",
     color: "#4cd964",
     desc: "Structural design, AutoCAD, Surveying, Construction Tech",
@@ -32,7 +41,7 @@ const branches = [
   },
   {
     id: "elec",
-    icon: "⚡",
+    icon: Zap,
     label: "Electronics",
     color: "#ff2d55",
     desc: "Circuit Design, Embedded Systems, IoT, VLSI, PCB",
@@ -40,7 +49,7 @@ const branches = [
   },
   {
     id: "it",
-    icon: "🌐",
+    icon: Globe,
     label: "IT / AI & ML",
     color: "#af52de",
     desc: "Deep Learning, NLP, Cloud, Cybersecurity, Data Science",
@@ -48,7 +57,7 @@ const branches = [
   },
   {
     id: "chem",
-    icon: "🧪",
+    icon: FlaskConical,
     label: "Chemical",
     color: "#ffcc00",
     desc: "Process Design, Simulation, Material Science, Environment",
@@ -56,66 +65,45 @@ const branches = [
   },
 ];
 
-// Maps a project title to a relevant emoji icon by keyword, so project
-// cards get a visual anchor beyond a plain number. Falls back to the
-// branch's own icon when no keyword matches.
-const projectIconMap = {
-  website: "🌐", portfolio: "🌐", chat: "💬", ml: "🧠", model: "🧠",
-  api: "🔌", "e-commerce": "🛒", ecommerce: "🛒",
-  robotic: "🦾", robot: "🦾", heat: "🔥", exchanger: "🔥", gear: "⚙️",
-  cad: "📐", drone: "🛸",
-  bridge: "🌉", city: "🏙️", earthquake: "🌋", water: "💧", building: "🏢", green: "🏢",
-  iot: "🏠", "smart home": "🏠", arduino: "🔧", pcb: "🖲️", signal: "📡", power: "🔋",
-  chatbot: "🤖", nlp: "🤖", image: "🖼️", classifier: "🖼️", fraud: "🕵️",
-  cloud: "☁️", face: "🙂", recognition: "🙂",
-  reactor: "⚗️", distillation: "🧪", wastewater: "🚰", polymer: "🧬", catalyst: "🔬",
-};
-
-function projectIcon(name, fallback) {
-  const lower = name.toLowerCase();
-  const hit = Object.keys(projectIconMap).find((key) => lower.includes(key));
-  return hit ? projectIconMap[hit] : fallback;
-}
-
 const services = [
-  { icon: "🚀", title: "Project Ideas", desc: "100+ curated project topics for every branch & semester" },
-  { icon: "📋", title: "Full Documentation", desc: "IEEE-format reports, abstracts, and project reports" },
-  { icon: "💡", title: "AI-Powered Help", desc: "Get instant guidance on your project doubts" },
-  { icon: "🎓", title: "Mini & Major Projects", desc: "From simple mini projects to full major project builds" },
-  { icon: "🖥️", title: "Code & Design", desc: "Working source code, circuit diagrams, and CAD files" },
-  { icon: "📊", title: "PPT & Presentation", desc: "Professional presentations with content and design" },
-  { icon: "🎯", title: "Career & Placement Guidance", desc: "Practical support for resumes, interviews, internships, placements, and your engineering career" },
+  { icon: Rocket, title: "Project Ideas", desc: "100+ curated project topics for every branch & semester" },
+  { icon: ClipboardList, title: "Full Documentation", desc: "IEEE-format reports, abstracts, and project reports" },
+  { icon: MessageCircleQuestion, title: "Doubt-Solving Support", desc: "Get personal guidance whenever you're stuck on your project" },
+  { icon: GraduationCap, title: "Mini & Major Projects", desc: "From simple mini projects to full major project builds" },
+  { icon: MonitorSmartphone, title: "Code & Design", desc: "Working source code, circuit diagrams, and CAD files" },
+  { icon: BarChart3, title: "PPT & Presentation", desc: "Professional presentations with content and design" },
+  { icon: Target, title: "Career & Placement Guidance", desc: "Practical support for resumes, interviews, internships, placements, and your engineering career" },
 ];
 
 const stats = [
-  { num: "🛠️", label: "Practical Engineering Support" },
-  { num: "💡", label: "Project Ideas & Guidance" },
-  { num: "🏛️", label: "Multiple Engineering Branches" },
-  { num: "🎓", label: "Built for Students" },
+  { icon: Wrench, label: "Practical Engineering Support" },
+  { icon: Lightbulb, label: "Project Ideas & Guidance" },
+  { icon: Landmark, label: "Multiple Engineering Branches" },
+  { icon: GraduationCap, label: "Built for Students" },
 ];
 
 const howItWorksSteps = [
   {
     num: "01",
-    icon: "📝",
+    icon: FileEdit,
     title: "Tell Us Your Project",
     desc: "Pick your branch, semester, and describe what you need — mini project, major project, or just guidance.",
   },
   {
     num: "02",
-    icon: "🤝",
-    title: "Get Matched Instantly",
-    desc: "We connect you with the right expert for your exact branch and topic — no generic templates.",
+    icon: Handshake,
+    title: "Get a Personal Response",
+    desc: "Your request is reviewed personally and you'll hear back with next steps for your exact branch and topic — no generic templates.",
   },
   {
     num: "03",
-    icon: "⚡",
+    icon: PackageCheck,
     title: "Receive Everything You Need",
     desc: "Working code, CAD/circuit files, IEEE-format documentation, and a polished PPT — all in one package.",
   },
   {
     num: "04",
-    icon: "🎯",
+    icon: Target,
     title: "Submit With Confidence",
     desc: "Understand every part of your project so you can explain it in viva and score full marks.",
   },
@@ -217,16 +205,16 @@ function useReveal() {
 
 function TrustStrip() {
   const items = [
-    { icon: "🔒", text: "100% Original Work" },
-    { icon: "⚡", text: "24–48hr Turnaround" },
-    { icon: "🎓", text: "Expert Engineers" },
-    { icon: "✅", text: "Verified & Secure" },
+    { icon: Lock, text: "100% Original Work" },
+    { icon: Zap, text: "24–48hr Turnaround" },
+    { icon: GraduationCap, text: "Engineer-Led Guidance" },
+    { icon: ShieldCheck, text: "Secure Data Handling" },
   ];
   return (
     <div className="trust-strip">
       {items.map((t) => (
         <div key={t.text} className="trust-item">
-          <span className="trust-icon">{t.icon}</span>
+          <span className="trust-icon"><t.icon size={16} strokeWidth={2.4} /></span>
           <span>{t.text}</span>
         </div>
       ))}
@@ -289,9 +277,8 @@ function Navbar({ active, setActive }) {
   return (
     <nav className={`navbar ${scrolled ? "scrolled" : ""}`}>
       <div className="nav-logo">
-        <span className="logo-icon">⚡</span>
+        <span className="logo-icon"><Zap size={22} strokeWidth={2.4} /></span>
         <span className="logo-text">EngiAssist</span>
-        <span className="logo-badge">PRO</span>
       </div>
       <ul className={`nav-links ${mobileOpen ? "open" : ""}`}>
         {links.map((l) => (
@@ -366,7 +353,7 @@ function Hero() {
         <div className="orb orb3"></div>
       </div>
       <div className="hero-content">
-        <div className="hero-badge">🎓 Engineering Help, Made Simple</div>
+        <div className="hero-badge"><GraduationCap size={15} strokeWidth={2.4} /> Engineering Help, Made Simple</div>
         <h1 className="hero-title">
           Your Ultimate Guide for<br />
           <span className="typed-line">
@@ -383,7 +370,7 @@ function Hero() {
             className="btn-primary"
             onClick={() => document.getElementById("branches").scrollIntoView({ behavior: "smooth" })}
           >
-            Explore Your Branch 🚀
+            Explore Your Branch <ArrowRight size={16} strokeWidth={2.4} />
           </button>
           <button
             className="btn-secondary"
@@ -395,7 +382,7 @@ function Hero() {
         <div className="hero-stats">
           {stats.map((s) => (
             <div key={s.label} className="stat-chip">
-              <span className="stat-num">{s.num}</span>
+              <span className="stat-num"><s.icon size={18} strokeWidth={2.2} /></span>
               <span className="stat-label">{s.label}</span>
             </div>
           ))}
@@ -403,12 +390,12 @@ function Hero() {
         <TrustStrip />
       </div>
       <div className="hero-visual">
-        <div className="floating-card fc1">💻 CS Project Help</div>
-        <div className="floating-card fc2">⚙️ Mech CAD Design</div>
-        <div className="floating-card fc3">🤖 AI/ML Models</div>
-        <div className="floating-card fc4">🏗️ Civil Reports</div>
+        <div className="floating-card fc1"><Cpu size={15} strokeWidth={2.2} /> CS Project Help</div>
+        <div className="floating-card fc2"><Cog size={15} strokeWidth={2.2} /> Mech CAD Design</div>
+        <div className="floating-card fc3"><Bot size={15} strokeWidth={2.2} /> AI/ML Models</div>
+        <div className="floating-card fc4"><Building2 size={15} strokeWidth={2.2} /> Civil Reports</div>
         <div className="center-glow">
-          <span>⚡</span>
+          <Zap size={34} strokeWidth={2.2} />
         </div>
       </div>
     </section>
@@ -433,7 +420,7 @@ function Branches() {
             style={{ "--accent": b.color }}
             onClick={() => setActive(active === b.id ? null : b.id)}
           >
-            <div className="branch-icon">{b.icon}</div>
+            <div className="branch-icon"><b.icon size={28} strokeWidth={2} /></div>
             <h3>{b.label}</h3>
             <p>{b.desc}</p>
             {active === b.id && (
@@ -474,7 +461,7 @@ function Services() {
       <div className="services-grid">
         {services.map((s, i) => (
           <Reveal key={s.title} delay={i * 60} className="service-card">
-            <div className="service-icon">{s.icon}</div>
+            <div className="service-icon"><s.icon size={26} strokeWidth={2} /></div>
             <h3>{s.title}</h3>
             <p>{s.desc}</p>
           </Reveal>
@@ -497,7 +484,7 @@ function HowItWorks() {
           <Reveal key={s.num} delay={i * 100} className="how-card-wrap">
             <div className="how-card">
               <span className="how-num">{s.num}</span>
-              <div className="how-icon">{s.icon}</div>
+              <div className="how-icon"><s.icon size={24} strokeWidth={2} /></div>
               <h3>{s.title}</h3>
               <p>{s.desc}</p>
             </div>
@@ -563,6 +550,25 @@ function Testimonials() {
 
 function FAQ() {
   const [open, setOpen] = useState(0);
+
+  useEffect(() => {
+    const schema = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: faqs.map((f) => ({
+        "@type": "Question",
+        name: f.q,
+        acceptedAnswer: { "@type": "Answer", text: f.a },
+      })),
+    };
+    const script = document.createElement("script");
+    script.type = "application/ld+json";
+    script.text = JSON.stringify(schema);
+    script.setAttribute("data-faq-schema", "true");
+    document.head.appendChild(script);
+    return () => script.remove();
+  }, []);
+
   return (
     <section className="faq-section" id="faq">
       <Reveal className="section-header light">
@@ -607,9 +613,9 @@ function AboutUs() {
           <p className="founder-role">CEO &amp; Founder, EngiAssist</p>
 
           <div className="founder-badges">
-            <span className="founder-badge">⚙️ Mechanical Engineer</span>
-            <span className="founder-badge">📈 Marketing Manager @ In Solar industry</span>
-            <span className="founder-badge">📍 Jalgaon, Maharashtra</span>
+            <span className="founder-badge"><Cog size={13} strokeWidth={2.2} /> Mechanical Engineer</span>
+            <span className="founder-badge"><TrendingUp size={13} strokeWidth={2.2} /> Marketing Manager @ In Solar industry</span>
+            <span className="founder-badge"><MapPin size={13} strokeWidth={2.2} /> Jalgaon, Maharashtra</span>
           </div>
 
           <a
@@ -618,7 +624,7 @@ function AboutUs() {
             rel="noopener noreferrer"
             className="founder-linkedin"
           >
-            🔗 Connect on LinkedIn
+            <ExternalLink size={15} strokeWidth={2.2} /> Connect on LinkedIn
           </a>
 
           <p className="founder-bio">
@@ -626,24 +632,24 @@ function AboutUs() {
             branch the same project guidance and support he wished he'd had —
             combining hands-on mechanical engineering expertise with real-world
             marketing and leadership experience In Solar industry. Based in
-            Jalgaon, Maharashtra, he's built EngiAssist into a trusted resource
-            for thousands of students working on mini and major projects.
+            Jalgaon, Maharashtra, he personally works with students on their
+            mini and major projects.
           </p>
         </div>
 
         <div className="about-highlights">
           <div className="about-highlight-card">
-            <div className="about-highlight-icon">🎓</div>
+            <div className="about-highlight-icon"><GraduationCap size={22} strokeWidth={2} /></div>
             <h4>Engineer-Led</h4>
             <p>Every project reviewed with real engineering rigor, not just templates.</p>
           </div>
           <div className="about-highlight-card">
-            <div className="about-highlight-icon">📣</div>
+            <div className="about-highlight-icon"><Megaphone size={22} strokeWidth={2} /></div>
             <h4>Marketing-Backed</h4>
             <p>Presentation and communication polish from real industry marketing experience.</p>
           </div>
           <div className="about-highlight-card">
-            <div className="about-highlight-icon">🇮🇳</div>
+            <div className="about-highlight-icon"><MapPin size={22} strokeWidth={2} /></div>
             <h4>Proudly Local</h4>
             <p>Based in Jalgaon, Maharashtra — supporting students across India.</p>
           </div>
@@ -666,7 +672,7 @@ function AboutPage() {
           <div className="orb orb2"></div>
         </div>
         <div className="about-hero-content">
-          <span className="hero-badge">🎓 The Story Behind EngiAssist</span>
+          <span className="hero-badge"><GraduationCap size={15} strokeWidth={2.4} /> The Story Behind EngiAssist</span>
           <h1 className="about-hero-title">About EngiAssist</h1>
           <p className="hero-sub">
             Built by an engineer who understands exactly what students need —
@@ -700,17 +706,17 @@ function Projects() {
             style={selectedBranch === b.id ? { "--tab-color": b.color } : {}}
             onClick={() => setSelectedBranch(b.id)}
           >
-            {b.icon} {b.label}
+            <b.icon size={15} strokeWidth={2.2} /> {b.label}
           </button>
         ))}
       </div>
       <div className="proj-cards" style={{ "--accent": current.color }}>
         {current.projects.map((p, i) => (
           <div key={p} className="proj-card" style={{ animationDelay: `${i * 0.07}s` }}>
-            <div className="proj-icon-badge">{projectIcon(p, current.icon)}</div>
+            <div className="proj-icon-badge"><current.icon size={22} strokeWidth={2} /></div>
             <div className="proj-number">0{i + 1}</div>
             <div className="proj-name">{p}</div>
-            <div className="proj-branch">{current.icon} {current.label}</div>
+            <div className="proj-branch"><current.icon size={13} strokeWidth={2.2} /> {current.label}</div>
             <button
               className="proj-btn"
               onClick={() => document.getElementById("contact").scrollIntoView({ behavior: "smooth" })}
@@ -830,17 +836,16 @@ Please contact me regarding my project.`;
         <div className="contact-info">
           <h3>Why Choose EngiAssist?</h3>
           <ul>
-            <li>✅ Expert guidance for all 6 engineering branches</li>
-            <li>✅ Complete project from scratch or partial help</li>
-            <li>✅ IEEE-format documentation & reports</li>
-            <li>✅ Working source code & design files</li>
-            <li>✅ Presentation & PPT preparation</li>
-            <li>✅ Fast turnaround — results in 24–48 hours</li>
+            <li><CheckCircle2 size={16} strokeWidth={2.2} /> Guidance for all 6 engineering branches</li>
+            <li><CheckCircle2 size={16} strokeWidth={2.2} /> Complete project from scratch or partial help</li>
+            <li><CheckCircle2 size={16} strokeWidth={2.2} /> IEEE-format documentation & reports</li>
+            <li><CheckCircle2 size={16} strokeWidth={2.2} /> Working source code & design files</li>
+            <li><CheckCircle2 size={16} strokeWidth={2.2} /> Presentation & PPT preparation</li>
+            <li><CheckCircle2 size={16} strokeWidth={2.2} /> Fast turnaround — results in 24–48 hours</li>
           </ul>
           <div className="contact-badges">
-            <span>🏆 Top Rated</span>
-            <span>⚡ Fast Delivery</span>
-            <span>🔒 100% Original</span>
+            <span><Zap size={13} strokeWidth={2.2} /> Fast Delivery</span>
+            <span><Lock size={13} strokeWidth={2.2} /> 100% Original</span>
           </div>
         </div>
 
@@ -854,7 +859,7 @@ Please contact me regarding my project.`;
               <input name="email" type="email" placeholder="Email Address *" value={form.email} onChange={handle} required />
               <select name="branch" value={form.branch} onChange={handle}>
                 {branches.map((b) => (
-                  <option key={b.id} value={b.id}>{b.icon} {b.label}</option>
+                  <option key={b.id} value={b.id}>{b.label}</option>
                 ))}
               </select>
             </div>
@@ -878,12 +883,12 @@ Please contact me regarding my project.`;
             </div>
             <textarea name="message" placeholder="Describe what help you need (specific requirements, existing issues, etc.)" rows={4} value={form.message} onChange={handle}></textarea>
             <button type="submit" className="btn-submit" disabled={submitting}>
-              {submitting ? "Submitting..." : "Submit Request 🚀"}
+              {submitting ? "Submitting..." : "Submit Request"} {!submitting && <ArrowRight size={16} strokeWidth={2.4} />}
             </button>
           </form>
         ) : (
           <div className="success-box">
-            <div className="success-icon">🎉</div>
+            <div className="success-icon"><CheckCircle2 size={40} strokeWidth={2} /></div>
             <h3>Requirement Received!</h3>
             <p className="success-lead-code">Reference ID: <strong>{leadCode}</strong></p>
             <p>Our team will review your requirement and reach out on WhatsApp. Quote the reference above if you follow up with us.</p>
@@ -900,7 +905,7 @@ function Footer() {
     <footer className="footer">
       <div className="footer-inner">
         <div className="footer-brand">
-          <span className="logo-icon">⚡</span>
+          <span className="logo-icon"><Zap size={20} strokeWidth={2.4} /></span>
           <span>EngiAssist</span>
         </div>
         <p>Empowering every engineering student to build, learn, and succeed.</p>
@@ -926,6 +931,11 @@ function Footer() {
               <a key={slug} href={c.path}>{c.heading}</a>
             ))}
           </div>
+        </div>
+        <div className="footer-legal-links">
+          <a href="/privacy-policy">Privacy Policy</a>
+          <a href="/terms-of-service">Terms of Service</a>
+          <a href="/refund-policy">Refund Policy</a>
         </div>
         <p className="footer-copy">© 2026 EngiAssist. Built for engineering students. 🇮🇳</p>
       </div>
@@ -967,7 +977,7 @@ function SeoCta({ heading = "Ready to get started?" }) {
       <Reveal className="seo-cta-inner">
         <h2>{heading}</h2>
         <div className="hero-btns">
-          <button className="btn-primary" onClick={openWhatsApp}>Chat on WhatsApp 🚀</button>
+          <button className="btn-primary" onClick={openWhatsApp}><MessageCircle size={16} strokeWidth={2.2} /> Chat on WhatsApp</button>
           <a className="btn-secondary" href="/#contact">Request This Service ↗</a>
         </div>
       </Reveal>
@@ -1033,8 +1043,8 @@ function BranchSeoPage({ branchId }) {
           <div className="orb orb2"></div>
         </div>
         <div className="about-hero-content">
-          <div className="seo-icon-badge" style={{ "--accent": branch.color }}>{branch.icon}</div>
-          <span className="hero-badge">{branch.icon} {branch.label}</span>
+          <div className="seo-icon-badge" style={{ "--accent": branch.color }}><branch.icon size={30} strokeWidth={2} /></div>
+          <span className="hero-badge"><branch.icon size={15} strokeWidth={2.2} /> {branch.label}</span>
           <h1 className="about-hero-title">{branch.label} Project Assistance</h1>
           <p className="hero-sub">{branch.desc}</p>
         </div>
@@ -1053,10 +1063,10 @@ function BranchSeoPage({ branchId }) {
         <div className="proj-cards" style={{ "--accent": branch.color }}>
           {branch.projects.map((p, i) => (
             <div key={p} className="proj-card" style={{ animationDelay: `${i * 0.07}s` }}>
-              <div className="proj-icon-badge">{projectIcon(p, branch.icon)}</div>
+              <div className="proj-icon-badge"><branch.icon size={22} strokeWidth={2} /></div>
               <div className="proj-number">0{i + 1}</div>
               <div className="proj-name">{p}</div>
-              <div className="proj-branch">{branch.icon} {branch.label}</div>
+              <div className="proj-branch"><branch.icon size={13} strokeWidth={2.2} /> {branch.label}</div>
               <a className="proj-btn" href="/#contact">Get This Project →</a>
             </div>
           ))}
@@ -1075,7 +1085,7 @@ function BranchSeoPage({ branchId }) {
 const serviceSeoPages = {
   "project-debugging": {
     path: "/project-debugging",
-    icon: "🛠️",
+    icon: Wrench,
     title: "Project Debugging Help for Engineering Students | EngiAssist",
     metaDescription: "Stuck with a broken engineering project? Get help fixing code errors, missing modules and database issues — for any branch, at any stage of completion.",
     heading: "Project Debugging & Error Fixing",
@@ -1084,7 +1094,7 @@ const serviceSeoPages = {
   },
   "project-documentation-help": {
     path: "/project-documentation-help",
-    icon: "📋",
+    icon: ClipboardList,
     title: "Project Documentation & Report Writing Help | EngiAssist",
     metaDescription: "IEEE-format project reports, synopsis, SRS documents and technical diagrams for engineering final year and mini projects.",
     heading: "Project Documentation & Reports",
@@ -1093,7 +1103,7 @@ const serviceSeoPages = {
   },
   "viva-preparation": {
     path: "/viva-preparation",
-    icon: "🎤",
+    icon: Mic,
     title: "Viva Preparation for Engineering Projects | EngiAssist",
     metaDescription: "Understand your engineering project well enough to defend it confidently in your viva — plain-language walkthroughs for every branch.",
     heading: "Viva & Project Explanation",
@@ -1102,7 +1112,7 @@ const serviceSeoPages = {
   },
   "ppt-presentation-help": {
     path: "/ppt-presentation-help",
-    icon: "📊",
+    icon: BarChart3,
     title: "Project PPT & Presentation Design Help | EngiAssist",
     metaDescription: "Professional PPT design and presentation preparation for engineering project submissions and final year project defense.",
     heading: "PPT & Presentation Design",
@@ -1111,7 +1121,7 @@ const serviceSeoPages = {
   },
   "career-placement-guidance": {
     path: "/career-placement-guidance",
-    icon: "🎯",
+    icon: Target,
     title: "Career & Placement Guidance for Engineering Students | EngiAssist",
     metaDescription: "Resume building, mock interviews, internship guidance and placement prep for engineering students — practical support, no false promises.",
     heading: "Career & Placement Guidance",
@@ -1136,8 +1146,8 @@ function ServiceSeoPage({ slug }) {
           <div className="orb orb2"></div>
         </div>
         <div className="about-hero-content">
-          <div className="seo-icon-badge">{content.icon}</div>
-          <span className="hero-badge">🎓 Engineering Project Support</span>
+          <div className="seo-icon-badge"><content.icon size={30} strokeWidth={2} /></div>
+          <span className="hero-badge"><GraduationCap size={15} strokeWidth={2.4} /> Engineering Project Support</span>
           <h1 className="about-hero-title">{content.heading}</h1>
           <p className="hero-sub">{content.intro}</p>
         </div>
@@ -1179,8 +1189,8 @@ function FinalYearProjectPage() {
           <div className="orb orb2"></div>
         </div>
         <div className="about-hero-content">
-          <div className="seo-icon-badge">🎓</div>
-          <span className="hero-badge">🎓 Final Year Project Assistance</span>
+          <div className="seo-icon-badge"><GraduationCap size={30} strokeWidth={2} /></div>
+          <span className="hero-badge"><GraduationCap size={15} strokeWidth={2.4} /> Final Year Project Assistance</span>
           <h1 className="about-hero-title">Final Year Project Help, Start to Submission</h1>
           <p className="hero-sub">
             From choosing a topic to building it, documenting it and defending it in your viva —
@@ -1272,6 +1282,150 @@ function Landing() {
   );
 }
 
+// Legal page drafts. These are reasonable starting-point templates for a
+// small, India-based, founder-led service business that collects contact-form
+// leads and sells a paid package — but they are NOT a substitute for review
+// by a qualified professional before publishing, especially around the
+// payment/refund terms.
+const legalPages = {
+  "privacy-policy": {
+    title: "Privacy Policy | EngiAssist",
+    heading: "Privacy Policy",
+    body: (
+      <>
+        <p>
+          EngiAssist ("we", "us") provides engineering project guidance to
+          students. This page explains what information we collect through
+          engiassist.in and how we use it.
+        </p>
+        <h2>Information We Collect</h2>
+        <ul>
+          <li>Contact details you submit through our request form: name, phone/WhatsApp number, email address.</li>
+          <li>Project details you choose to share: branch, semester, project topic, current status, deadline, and any message you write.</li>
+        </ul>
+        <p>We do not collect payment card details directly — any payment is handled through a third-party payment processor.</p>
+        <h2>How We Use Your Information</h2>
+        <ul>
+          <li>To respond to your request and provide the project guidance you asked for.</li>
+          <li>To contact you on WhatsApp, phone, or email about your request.</li>
+          <li>We do not sell your personal information to third parties.</li>
+        </ul>
+        <h2>How Your Information Is Stored</h2>
+        <p>
+          Form submissions are stored in a secured database with access
+          restricted to EngiAssist. We take reasonable technical measures to
+          protect your data, but no online system can be guaranteed 100%
+          secure.
+        </p>
+        <h2>Your Choices</h2>
+        <p>
+          You can ask us to delete your submitted information at any time by
+          messaging us on WhatsApp or emailing us with your request.
+        </p>
+        <h2>Contact</h2>
+        <p>Questions about this policy can be sent via the contact form on this site or on WhatsApp.</p>
+      </>
+    ),
+  },
+  "terms-of-service": {
+    title: "Terms of Service | EngiAssist",
+    heading: "Terms of Service",
+    body: (
+      <>
+        <p>
+          By using engiassist.in or engaging EngiAssist for project help, you
+          agree to the terms below.
+        </p>
+        <h2>What We Provide</h2>
+        <p>
+          EngiAssist provides guidance, code, documentation, presentation, and
+          related support for engineering student projects, as agreed with
+          you before work begins. Exact scope, deliverables, and timeline are
+          confirmed individually for each request — this website describes
+          our general services, not a binding quote for every case.
+        </p>
+        <h2>Your Responsibilities</h2>
+        <ul>
+          <li>You are responsible for how you use any material we provide, including complying with your institution's academic integrity policies.</li>
+          <li>Please provide accurate project details so we can give you relevant guidance.</li>
+        </ul>
+        <h2>Academic Integrity</h2>
+        <p>
+          We provide guidance and support to help you understand and complete
+          your own project. You remain responsible for how you present and
+          submit any work at your institution, and for complying with your
+          college's rules on originality and permitted assistance.
+        </p>
+        <h2>Payments</h2>
+        <p>
+          Where a paid package is agreed (for example, the Founding Batch
+          offer), pricing and inclusions will be stated clearly before you
+          pay. See our Refund Policy for cancellation terms.
+        </p>
+        <h2>Limitation of Liability</h2>
+        <p>
+          We aim to provide accurate, useful guidance, but we do not
+          guarantee any specific grade, evaluation outcome, or placement
+          result, since these depend on factors outside our control.
+        </p>
+        <h2>Changes</h2>
+        <p>We may update these terms from time to time; the current version will always be posted on this page.</p>
+      </>
+    ),
+  },
+  "refund-policy": {
+    title: "Refund Policy | EngiAssist",
+    heading: "Refund Policy",
+    body: (
+      <>
+        <p>
+          This policy applies to any paid package offered by EngiAssist,
+          including the Founding Batch offer.
+        </p>
+        <h2>Before Work Begins</h2>
+        <p>
+          If you cancel before we begin work on your request, you are
+          eligible for a full refund.
+        </p>
+        <h2>After Work Begins</h2>
+        <p>
+          Once we have started work on your project (for example, reviewing
+          your requirements, building code, or preparing documentation), a
+          partial refund may be available depending on the work already
+          completed, at our discretion. This will be discussed with you
+          directly before any deduction is made.
+        </p>
+        <h2>How to Request a Refund</h2>
+        <p>
+          Message us on WhatsApp or email with your reference ID and the
+          reason for your request. We aim to respond within 2 business days.
+        </p>
+        <h2>Non-Refundable Situations</h2>
+        <p>
+          Refunds are not available once all agreed deliverables have been
+          completed and shared with you.
+        </p>
+      </>
+    ),
+  },
+};
+
+function LegalPage({ slug }) {
+  const content = legalPages[slug];
+  useSeoMeta({ title: content.title, description: content.title, path: `/${slug}` });
+  return (
+    <div className="app">
+      <Navbar active={null} setActive={() => {}} />
+      <div className="legal-page">
+        <h1>{content.heading}</h1>
+        <p className="legal-updated">Last updated: September 2026</p>
+        {content.body}
+      </div>
+      <Footer />
+    </div>
+  );
+}
+
 export default function App() {
   // Lightweight path-based routing — no router library needed for a few pages.
   const path =
@@ -1290,6 +1444,7 @@ export default function App() {
   let page;
   if (path === "/about") page = <AboutPage />;
   else if (path === "/final-year-project-help") page = <FinalYearProjectPage />;
+  else if (legalPages[path.replace(/^\//, "")]) page = <LegalPage slug={path.replace(/^\//, "")} />;
   else {
     const branchMatch = Object.entries(branchSeoContent).find(([, c]) => c.path === path);
     const serviceMatch = Object.entries(serviceSeoPages).find(([, c]) => c.path === path);
