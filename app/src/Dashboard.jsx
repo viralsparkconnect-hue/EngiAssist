@@ -10,12 +10,12 @@ const projectStatusMeta = {
 };
 
 const branchMeta = {
-  cs: { label: "Computer Science", icon: "💻", color: "#00f5ff" },
-  mech: { label: "Mechanical", icon: "⚙️", color: "#ff9500" },
-  civil: { label: "Civil", icon: "🏗️", color: "#4cd964" },
-  elec: { label: "Electronics", icon: "⚡", color: "#ff2d55" },
-  it: { label: "IT / AI & ML", icon: "🌐", color: "#af52de" },
-  chem: { label: "Chemical", icon: "🧪", color: "#ffcc00" },
+  cs: { label: "Computer Science" },
+  mech: { label: "Mechanical" },
+  civil: { label: "Civil" },
+  elec: { label: "Electronics" },
+  it: { label: "IT / AI & ML" },
+  chem: { label: "Chemical" },
 };
 
 function LoginScreen({ onLoggedIn }) {
@@ -38,17 +38,17 @@ function LoginScreen({ onLoggedIn }) {
   };
 
   return (
-    <div className="dash-login-wrap">
+    <main className="dash-login-wrap">
       <div className="dash-login-card">
         <div className="dash-login-logo">
-          <span>⚡</span> EngiAssist <span className="dash-badge">ADMIN</span>
+          <img src="/logo-96.png" alt="" width="30" height="30" /> EngiAssist <span className="dash-badge">Admin</span>
         </div>
-        <h1>Dashboard Login</h1>
+        <h1>Dashboard login</h1>
         <p className="dash-login-sub">Sign in with the admin account you created in Supabase → Authentication.</p>
         <form onSubmit={submit}>
           <input
             type="email"
-            placeholder="Email"
+            placeholder="Email" aria-label="Email" autoComplete="username"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -56,7 +56,7 @@ function LoginScreen({ onLoggedIn }) {
           />
           <input
             type="password"
-            placeholder="Password"
+            placeholder="Password" aria-label="Password" autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -68,18 +68,15 @@ function LoginScreen({ onLoggedIn }) {
         </form>
         <a href="/" className="dash-back-link">← Back to site</a>
       </div>
-    </div>
+    </main>
   );
 }
 
-function StatCard({ label, value, icon, accent }) {
+function StatCard({ label, value, attention }) {
   return (
-    <div className="stat-card" style={{ "--accent": accent }}>
-      <div className="stat-card-icon">{icon}</div>
-      <div>
-        <div className="stat-card-value">{value}</div>
-        <div className="stat-card-label">{label}</div>
-      </div>
+    <div className={`stat-card ${attention ? "is-attention" : ""}`}>
+      <div className="stat-card-value">{value}</div>
+      <div className="stat-card-label">{label}</div>
     </div>
   );
 }
@@ -185,22 +182,22 @@ function DashboardApp({ session, onLogout }) {
     <div className="dash">
       <header className="dash-header">
         <div className="dash-header-left">
-          <span className="dash-logo">⚡ EngiAssist</span>
-          <span className="dash-badge">ADMIN</span>
+          <span className="dash-logo"><img src="/logo-96.png" alt="" width="28" height="28" /> EngiAssist</span>
+          <span className="dash-badge">Admin</span>
         </div>
         <div className="dash-header-right">
           <span className="dash-user">{session?.user?.email}</span>
-          <button className="dash-btn-ghost" onClick={fetchLeads}>↻ Refresh</button>
+          <button className="dash-btn-ghost" onClick={fetchLeads}>Refresh</button>
           <button className="dash-btn-ghost" onClick={onLogout}>Log Out</button>
         </div>
       </header>
 
       <main className="dash-main">
         <div className="dash-stats-grid">
-          <StatCard label="Total Leads" value={stats.total} icon="📥" accent="#00f5ff" />
-          <StatCard label="New (Unhandled)" value={stats.newCount} icon="🆕" accent="#ff2d55" />
-          <StatCard label="Today" value={stats.today} icon="📅" accent="#4cd964" />
-          <StatCard label="Last 7 Days" value={stats.week} icon="📈" accent="#af52de" />
+          <StatCard label="Total leads" value={stats.total} />
+          <StatCard label="New (unhandled)" value={stats.newCount} attention />
+          <StatCard label="Today" value={stats.today} />
+          <StatCard label="Last 7 days" value={stats.week} />
         </div>
 
         <div className="dash-panel">
@@ -212,11 +209,11 @@ function DashboardApp({ session, onLogout }) {
               const count = stats.byBranch[id] || 0;
               return (
                 <div className="branch-bar-row" key={id}>
-                  <span className="branch-bar-label">{branchMeta[id].icon} {branchMeta[id].label}</span>
+                  <span className="branch-bar-label">{branchMeta[id].label}</span>
                   <div className="branch-bar-track">
                     <div
                       className="branch-bar-fill"
-                      style={{ width: `${(count / maxBranchCount) * 100}%`, background: branchMeta[id].color }}
+                      style={{ width: `${(count / maxBranchCount) * 100}%` }}
                     ></div>
                   </div>
                   <span className="branch-bar-count">{count}</span>
@@ -239,7 +236,7 @@ function DashboardApp({ session, onLogout }) {
               <select value={branchFilter} onChange={(e) => setBranchFilter(e.target.value)}>
                 <option value="all">All Branches</option>
                 {Object.entries(branchMeta).map(([id, b]) => (
-                  <option key={id} value={id}>{b.icon} {b.label}</option>
+                  <option key={id} value={id}>{b.label}</option>
                 ))}
               </select>
               <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
@@ -248,7 +245,7 @@ function DashboardApp({ session, onLogout }) {
                 <option value="contacted">Contacted</option>
                 <option value="closed">Closed</option>
               </select>
-              <button className="dash-btn-primary" onClick={exportCSV}>⬇ Export CSV</button>
+              <button className="dash-btn-primary" onClick={exportCSV}>Export CSV</button>
             </div>
           </div>
 
@@ -285,8 +282,8 @@ function DashboardApp({ session, onLogout }) {
                         <div className="dash-cell-email">{l.phone || "—"}</div>
                       </td>
                       <td>
-                        <span className="dash-chip" style={{ "--accent": branchMeta[l.branch]?.color || "#888" }}>
-                          {branchMeta[l.branch]?.icon} {branchMeta[l.branch]?.label || l.branch}
+                        <span className="dash-chip">
+                          {branchMeta[l.branch]?.label || l.branch}
                         </span>
                       </td>
                       <td>{l.semester || "—"}</td>
@@ -307,7 +304,7 @@ function DashboardApp({ session, onLogout }) {
                         </select>
                       </td>
                       <td>
-                        <button className="dash-btn-icon" title="Delete lead" onClick={() => deleteLead(l.id)}>🗑</button>
+                        <button className="dash-btn-icon" title="Delete lead" aria-label="Delete lead" onClick={() => deleteLead(l.id)}>Delete</button>
                       </td>
                     </tr>
                   ))}

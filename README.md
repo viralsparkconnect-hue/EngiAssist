@@ -1,62 +1,76 @@
-# ⚡ EngiAssist — Engineering Student Project Portal
+# EngiAssist — Engineering Student Project Portal
 
-India's #1 platform to help engineering students build projects across all branches.
+A React (Vite) website that helps engineering students get project guidance across six branches:
+Computer Science, IT / AI & ML, Mechanical, Civil, Electronics and Chemical.
 
-## 🎓 Supported Branches
-- 💻 Computer Science & IT
-- ⚙️ Mechanical Engineering
-- 🏗️ Civil Engineering
-- ⚡ Electronics & Communication
-- 🌐 AI/ML & Data Science
-- 🧪 Chemical Engineering
+## What is in the site
 
-## 🚀 Features
-- Branch-specific project ideas (100+ topics)
-- Contact form for project help requests
-- Serverless API backend (Vercel Functions)
-- Fully responsive premium UI
+- Landing page with branches, services, process, project ideas, FAQ and a request form
+- SEO pages per branch (`/cse-project-help` …), per service (`/project-debugging` …) and `/final-year-project-help`
+- About, Privacy Policy, Terms of Service and Refund Policy pages
+- Request form: saves the lead to Supabase and opens WhatsApp with the details pre-filled
+- Admin dashboard at `/dashboard` (login with your Supabase user) to see and manage leads
+- `public/founding-batch.html`: standalone launch-offer page (edit the `CONFIG` block at the top of its script)
 
-## 🛠️ Local Development
+## Design system
+
+Refined dark: deep ink-blue background, warm white text, **one** amber accent.
+
+| Role | Font | Notes |
+| --- | --- | --- |
+| Headings | Bricolage Grotesque | self-hosted via `@fontsource-variable` |
+| Text | Geist | self-hosted via `@fontsource-variable` |
+
+All colours, spacing and radii are tokens at the top of `app/src/index.css` (`:root`).
+Change `--amb` there to re-colour the whole site. `public/founding-batch.html` repeats the same tokens
+in its own `<style>` (it is a separate static page), so update both if you change the palette.
+
+## Local development
 
 ```bash
 cd app
+cp .env.example .env      # then fill in your Supabase URL + anon key
 npm install
 npm run dev
 ```
 
-## 🌐 Deploy to Vercel
+## Supabase setup
+
+1. Supabase Dashboard → SQL Editor → run `supabase/schema.sql`
+2. Authentication → Users → add yourself (email + password): this is your `/dashboard` login
+3. Authentication → Sign In / Providers → **turn off "Allow new users to sign up"**
+   (the schema lets any signed-in user read leads, so nobody else should be able to create an account)
+4. Optional: run `supabase/optional_hardening.sql` (read the comments in it first)
+
+## Deploy to Vercel
 
 1. Push this repo to GitHub
-2. Go to [vercel.com](https://vercel.com) → New Project → Import from GitHub
-3. Vercel auto-detects settings from `vercel.json`
-4. Click **Deploy** — done!
+2. Vercel → New Project → import the repo (settings come from `vercel.json`)
+3. Project → Settings → Environment Variables → add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`
+4. Deploy
 
-Your site will be live at `https://your-project.vercel.app`
-
-## 📁 Project Structure
+## Project structure
 
 ```
-├── app/              # React (Vite) frontend
+├── app/
+│   ├── public/            # static files: logo, favicons, fonts, sitemap, founding-batch.html
 │   ├── src/
-│   │   ├── App.jsx   # Main component
-│   │   └── index.css # Premium styles
-│   └── index.html
-├── api/              # Vercel serverless functions
-│   ├── request.js    # Handle project requests
-│   └── projects.js   # Project data API
-├── vercel.json       # Deployment config
-└── README.md
+│   │   ├── App.jsx        # pages, sections, form, router, SEO content
+│   │   ├── index.css      # design tokens + all site styles
+│   │   ├── Dashboard.jsx  # admin leads dashboard
+│   │   ├── dashboard.css
+│   │   └── lib/supabaseClient.js
+│   └── index.html         # meta tags, structured data, analytics
+├── supabase/
+│   ├── schema.sql
+│   └── optional_hardening.sql
+└── vercel.json
 ```
 
-## 🔧 Git Commands to Upload
+## Publishing your changes
 
 ```bash
-git init
 git add .
-git commit -m "✨ New premium EngiAssist portal"
-git remote add origin https://github.com/viralsparkconnect-hue/student-assist-portal.git
-git push -u origin main --force
+git commit -m "Redesign: refined dark design system"
+git push
 ```
-
----
-Built with ❤️ for Engineering Students 🇮🇳

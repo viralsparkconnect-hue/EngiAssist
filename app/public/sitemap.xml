@@ -61,6 +61,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.engiassist.in/career-placement-guidance</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://www.engiassist.in/ppt-presentation-help</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
