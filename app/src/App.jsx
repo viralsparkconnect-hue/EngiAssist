@@ -907,43 +907,52 @@ function Footer() {
   return (
     <footer className="footer">
       <div className="footer-inner">
-        <div className="footer-brand">
-          <img src="/logo.png" alt="EngiAssist logo" className="logo-icon-img" />
-          <span>EngiAssist</span>
-        </div>
-        <p>Empowering every engineering student to build, learn, and succeed.</p>
-        <a href="mailto:Contact@Engiassist.in" className="footer-email">
-          <Mail size={14} strokeWidth={2.2} /> Contact@Engiassist.in
-        </a>
-        <div className="footer-links">
-          <a href="/">Home</a>
-          <a href="/#branches">Branches</a>
-          <a href="/#services">Services</a>
-          <a href="/about">About</a>
-          <a href="/#projects">Projects</a>
-          <a href="/#contact">Contact</a>
-        </div>
-        <div className="footer-seo-links">
-          <div className="footer-seo-col">
-            <p className="footer-seo-title">By Branch</p>
-            {Object.entries(branchSeoContent).map(([id, c]) => (
-              <a key={id} href={c.path}>{branches.find((b) => b.id === id)?.label} Projects</a>
-            ))}
+        <div className="footer-top">
+          <div className="footer-brand-col">
+            <div className="footer-brand">
+              <img src="/logo.png" alt="EngiAssist logo" className="logo-icon-img" />
+              <span>EngiAssist</span>
+            </div>
+            <p className="footer-tagline">Empowering every engineering student to build, learn, and succeed.</p>
+            <a href="mailto:Contact@Engiassist.in" className="footer-email">
+              <Mail size={14} strokeWidth={2.2} /> Contact@Engiassist.in
+            </a>
           </div>
-          <div className="footer-seo-col">
-            <p className="footer-seo-title">By Service</p>
+
+          <nav className="footer-col" aria-label="Explore">
+            <p className="footer-col-title">Explore</p>
+            <a href="/">Home</a>
+            <a href="/#branches">Branches</a>
+            <a href="/#services">Services</a>
+            <a href="/about">About</a>
+            <a href="/#projects">Projects</a>
+            <a href="/#contact">Contact</a>
+          </nav>
+
+          <nav className="footer-col" aria-label="By branch">
+            <p className="footer-col-title">By branch</p>
+            {Object.entries(branchSeoContent).map(([id, c]) => (
+              <a key={id} href={c.path}>{branches.find((b) => b.id === id)?.label} projects</a>
+            ))}
+          </nav>
+
+          <nav className="footer-col" aria-label="By service">
+            <p className="footer-col-title">By service</p>
             <a href="/final-year-project-help">Final Year Project Help</a>
             {Object.entries(serviceSeoPages).map(([slug, c]) => (
               <a key={slug} href={c.path}>{c.heading}</a>
             ))}
+          </nav>
+        </div>
+
+        <div className="footer-bottom">
+          <p className="footer-copy">© 2026 EngiAssist. Built for engineering students in India.</p>
+          <div className="footer-legal-links">
+            <a href="/privacy-policy">Privacy Policy</a>
+            <a href="/terms-of-service">Terms of Service</a>
+            <a href="/refund-policy">Refund Policy</a>
           </div>
         </div>
-        <div className="footer-legal-links">
-          <a href="/privacy-policy">Privacy Policy</a>
-          <a href="/terms-of-service">Terms of Service</a>
-          <a href="/refund-policy">Refund Policy</a>
-        </div>
-        <p className="footer-copy">© 2026 EngiAssist. Built for engineering students. 🇮🇳</p>
       </div>
     </footer>
   );
