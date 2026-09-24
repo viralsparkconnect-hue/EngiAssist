@@ -1736,3 +1736,24 @@ section { padding: 6rem 5%; }
     justify-content: center;
   }
 }
+
+/* ===== EngiSun (solar division) link + promo ===== */
+.nav-links a.nav-solar{color:var(--gold);font-weight:700}
+.nav-links a.nav-solar:hover{color:#ff7a18}
+.solar-promo{padding:70px 24px;background:var(--bg)}
+.solar-promo-inner{position:relative;max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:32px;flex-wrap:wrap;padding:44px 48px;border-radius:26px;overflow:hidden;background:linear-gradient(120deg,rgba(255,190,61,.14),rgba(255,122,24,.07) 55%,rgba(124,111,255,.08));border:1px solid rgba(255,190,61,.3);box-shadow:0 24px 70px rgba(255,140,30,.12)}
+.solar-promo-inner::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.07) 50%,transparent 65%);transform:translateX(-120%);animation:solarShim 5s infinite;pointer-events:none}
+@keyframes solarShim{60%,100%{transform:translateX(120%)}}
+.solar-sun{position:relative;width:96px;height:96px;flex-shrink:0;display:grid;place-items:center}
+.solar-sun span{width:56px;height:56px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3b0,#ffbe3d 45%,#ff7a18);box-shadow:0 0 50px 14px rgba(255,150,30,.5);animation:solarPulse 3.5s ease-in-out infinite}
+.solar-sun::before{content:"";position:absolute;inset:0;border-radius:50%;border:2px dashed rgba(255,190,61,.5);animation:solarSpin 18s linear infinite}
+@keyframes solarPulse{50%{transform:scale(1.12)}}
+@keyframes solarSpin{to{transform:rotate(360deg)}}
+.solar-copy{flex:1;min-width:260px}
+.solar-tag{display:inline-block;font-size:.75rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+.solar-copy h2{font-family:'Unbounded',sans-serif;font-size:clamp(1.5rem,3vw,2.2rem);margin-bottom:8px}
+.solar-grad{background:linear-gradient(120deg,#ffd76a,#ffbe3d 40%,#ff7a18);-webkit-background-clip:text;background-clip:text;color:transparent}
+.solar-copy p{color:var(--muted);max-width:560px}
+.solar-cta{display:inline-flex;align-items:center;gap:10px;padding:15px 30px;border-radius:99px;font-weight:700;color:#1a1000;background:linear-gradient(120deg,#ffd76a,#ffbe3d 40%,#ff7a18);box-shadow:0 10px 34px rgba(255,150,30,.35);transition:transform .25s,box-shadow .25s}
+.solar-cta:hover{transform:translateY(-3px);box-shadow:0 16px 44px rgba(255,150,30,.5)}
+@media(max-width:700px){.solar-promo-inner{padding:32px 24px}}

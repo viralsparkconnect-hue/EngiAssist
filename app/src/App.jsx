@@ -292,6 +292,9 @@ function Navbar({ active, setActive }) {
             </a>
           </li>
         ))}
+        <li>
+          <a href="/Engisun" className="nav-solar">☀ EngiSun</a>
+        </li>
       </ul>
       <div className="nav-actions">
         <button
@@ -927,6 +930,7 @@ function Footer() {
             <a href="/about">About</a>
             <a href="/#projects">Projects</a>
             <a href="/#contact">Contact</a>
+            <a href="/Engisun">EngiSun Solar ☀</a>
           </nav>
 
           <nav className="footer-col" aria-label="By branch">
@@ -1275,6 +1279,22 @@ function FloatingWhatsApp() {
   );
 }
 
+function SolarPromo() {
+  return (
+    <section className="solar-promo" id="engisun">
+      <div className="solar-promo-inner">
+        <div className="solar-sun" aria-hidden="true"><span></span></div>
+        <div className="solar-copy">
+          <span className="solar-tag">☀ New from EngiAssist</span>
+          <h2>Introducing <span className="solar-grad">EngiSun</span></h2>
+          <p>Our solar division — DCR &amp; non-DCR rooftop installation for homes and businesses, with subsidy guidance and net metering support.</p>
+        </div>
+        <a href="/Engisun" className="solar-cta">Explore EngiSun <ArrowRight size={18} strokeWidth={2.4} /></a>
+      </div>
+    </section>
+  );
+}
+
 function Landing() {
   const [active, setActive] = useState("Home");
 
@@ -1286,6 +1306,7 @@ function Landing() {
       <Branches />
       <HowItWorks />
       <Services />
+      <SolarPromo />
       <FixMyProject />
       <Testimonials />
       <Projects />
