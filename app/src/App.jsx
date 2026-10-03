@@ -66,7 +66,7 @@ const branches = [
 ];
 
 const services = [
-  { icon: Rocket, title: "Project Ideas", desc: "100+ curated project topics for every branch & semester" },
+  { icon: Rocket, title: "Project Ideas", desc: "Project ideas for every branch & semester" },
   { icon: ClipboardList, title: "Full Documentation", desc: "IEEE-format reports, abstracts, and project reports" },
   { icon: MessageCircleQuestion, title: "Doubt-Solving Support", desc: "Get personal guidance whenever you're stuck on your project" },
   { icon: GraduationCap, title: "Mini & Major Projects", desc: "From simple mini projects to full major project builds" },
@@ -328,7 +328,7 @@ function Navbar({ active, setActive }) {
 
 function Hero() {
   // Existing capability labels from the previous trust strip, shown once.
-  const facts = ["100% Original Work", "24–48hr Turnaround", "Engineer-Led Guidance", "Secure Data Handling"];
+  const facts = ["Original project guidance", "24–48hr Turnaround", "Engineer-Led Guidance", "Secure Data Handling"];
   return (
     <section className="hero" id="home" aria-labelledby="hero-title">
       <div className="container hero-grid">
@@ -515,31 +515,6 @@ function FixMyProject({ n }) {
   );
 }
 
-// NOTE: testimonial content is unchanged from the repository and has not been
-// verified as genuine — see the final report.
-function Testimonials({ n }) {
-  return (
-    <section className="section" id="testimonials" aria-labelledby="testimonials-title">
-      <div className="container">
-        <SectionHead n={n} label="Student voices" title="What Students Say" titleId="testimonials-title">
-          Real feedback from students who got their projects done right
-        </SectionHead>
-        <div className="quote-grid">
-          {testimonials.map((t) => (
-            <figure key={t.name} className="quote">
-              <blockquote><p>{t.quote}</p></blockquote>
-              <figcaption>
-                <span className="quote-name">{t.name}</span>
-                <span className="quote-meta">{t.branch}</span>
-              </figcaption>
-            </figure>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function FAQ({ n }) {
   const [open, setOpen] = useState(0);
 
@@ -666,7 +641,6 @@ function AboutPage() {
           sub="Built by an engineer who understands exactly what students need — not just a finished project, but real understanding."
         />
         <AboutUs />
-        <Testimonials />
       </main>
       <Footer />
     </div>
@@ -834,7 +808,7 @@ Please contact me regarding my project.`;
             </ul>
             <ul className="contact-badges">
               <li><Zap size={13} strokeWidth={2} aria-hidden="true" /> Fast Delivery</li>
-              <li><Lock size={13} strokeWidth={2} aria-hidden="true" /> 100% Original</li>
+              <li><Lock size={13} strokeWidth={2} aria-hidden="true" /> Original project guidance</li>
             </ul>
             <a href="mailto:Contact@Engiassist.in" className="text-link contact-email">
               <Mail size={16} strokeWidth={2} aria-hidden="true" /> Contact@Engiassist.in
@@ -1263,9 +1237,8 @@ function Landing() {
         <HowItWorks n="03" />
         <Projects n="04" />
         <FixMyProject n="05" />
-        <Testimonials n="06" />
-        <FAQ n="07" />
-        <Contact n="08" />
+        <FAQ n="06" />
+        <Contact n="07" />
         <SolarPromo />
       </main>
       <Footer />

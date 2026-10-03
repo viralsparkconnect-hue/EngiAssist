@@ -365,14 +365,6 @@ h3 { font-size: var(--fs-18); }
 .checklist li::before { content: '—'; position: absolute; left: 0; color: var(--accent); font-family: var(--mono); }
 @media (max-width: 900px) { .split { grid-template-columns: minmax(0, 1fr); gap: var(--s6); } }
 
-/* Testimonials (existing content, restyled only) */
-.quote-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--s6); }
-.quote { margin: 0; padding-left: var(--s5); border-left: 2px solid var(--border-strong); }
-.quote p { margin-bottom: var(--s4); }
-.quote figcaption { display: flex; flex-direction: column; gap: 2px; }
-.quote-name { font-size: var(--fs-14); font-weight: 600; }
-.quote-meta { font-family: var(--mono); font-size: var(--fs-12); color: var(--muted); }
-
 /* Projects */
 .tabs { display: flex; flex-wrap: wrap; gap: var(--s2); margin-bottom: var(--s4); }
 .tab {
