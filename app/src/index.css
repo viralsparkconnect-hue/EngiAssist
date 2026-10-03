@@ -250,6 +250,11 @@ h3 { font-size: var(--fs-18); }
   .hero-grid { grid-template-columns: minmax(0, 1fr); gap: var(--s7); }
   .hero-title { max-width: 20ch; }
 }
+@media (max-width: 640px) {
+  .bi-desc { display: none; }
+  .bi-row { padding-block: var(--s3); align-items: center; }
+  .bi-num { padding-top: 0; }
+}
 @media (max-width: 480px) {
   .hero-actions .btn { width: 100%; }
   .bi-row, .bi-head { padding-inline: var(--s4); }
@@ -304,8 +309,8 @@ h3 { font-size: var(--fs-18); }
 /* Services */
 .service-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--s8); border-bottom: 1px solid var(--border); }
 .service-grid > li { border-top: 1px solid var(--border); }
-.service-row { display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: var(--s4); padding: var(--s5) 0; }
-.service-icon { color: var(--accent); padding-top: 2px; }
+.service-row { display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: var(--s4); padding: var(--s5) 0; }
+.service-row .row-num { padding-top: 6px; }
 .service-row h3 { margin-bottom: var(--s2); }
 .service-row p { color: var(--text-2); }
 .service-row .text-link { margin-top: var(--s3); }
@@ -485,8 +490,9 @@ h3 { font-size: var(--fs-18); }
 }
 .founder-name { font-size: var(--fs-22); }
 .founder-role { color: var(--accent); font-size: var(--fs-14); font-weight: 500; margin: var(--s1) 0 var(--s4); }
-.founder-tags { display: flex; flex-wrap: wrap; gap: var(--s2); margin-bottom: var(--s5); }
-.founder-tags li { display: inline-flex; align-items: center; gap: 6px; padding: 4px var(--s2); border: 1px solid var(--border-strong); border-radius: var(--r-sm); font-size: var(--fs-14); color: var(--text-2); }
+.founder-facts { margin-bottom: var(--s5); border-top: 1px solid var(--border); }
+.founder-facts li { display: flex; align-items: center; gap: var(--s3); padding: var(--s2) 0; border-bottom: 1px solid var(--border); font-size: var(--fs-14); color: var(--text-2); }
+.founder-facts svg { color: var(--accent); flex-shrink: 0; }
 .founder-bio { color: var(--text-2); margin-bottom: var(--s5); max-width: 60ch; }
 .about-points { border-bottom: 1px solid var(--border); }
 .about-points li { display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: var(--s4); padding: var(--s5) 0; border-top: 1px solid var(--border); }

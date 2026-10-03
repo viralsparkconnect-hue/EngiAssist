@@ -234,7 +234,7 @@ function SectionHead({ n, label, title, titleId, children }) {
   return (
     <Reveal className="section-head">
       <p className="label">
-        {n && (<><span className="label-num">{n}</span>{" — "}</>)}
+        {n && (<><span className="label-num">{n}</span>{" / "}</>)}
         {label}
       </p>
       <h2 id={titleId}>{title}</h2>
@@ -434,14 +434,14 @@ function Services({ n }) {
   return (
     <section className="section" id="services" aria-labelledby="services-title">
       <div className="container">
-        <SectionHead n={n} label="Services" title="Everything You Need to Excel" titleId="services-title">
+        <SectionHead n={n} label="Services" title="What We Help You Build" titleId="services-title">
           Complete engineering project support from idea to submission
         </SectionHead>
         <ul className="service-grid">
-          {core.map((s) => (
+          {core.map((s, i) => (
             <li key={s.title}>
               <div className="service-row">
-                <span className="service-icon" aria-hidden="true"><s.icon size={22} strokeWidth={1.75} /></span>
+                <span className="row-num">{pad(i)}</span>
                 <div>
                   <h3>{s.title}</h3>
                   <p>{s.desc}</p>
@@ -611,7 +611,7 @@ function AboutUs() {
             <div className="founder-avatar" aria-hidden="true">PP</div>
             <h3 className="founder-name">Pratik Patil</h3>
             <p className="founder-role">CEO &amp; Founder, EngiAssist</p>
-            <ul className="founder-tags">
+            <ul className="founder-facts">
               <li><Cog size={14} strokeWidth={2} aria-hidden="true" /> Mechanical Engineer</li>
               <li><TrendingUp size={14} strokeWidth={2} aria-hidden="true" /> Marketing Manager @ In Solar industry</li>
               <li><MapPin size={14} strokeWidth={2} aria-hidden="true" /> Jalgaon, Maharashtra</li>
