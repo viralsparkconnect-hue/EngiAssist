@@ -6,8 +6,8 @@ import {
   MonitorSmartphone, BarChart3, Target,
   Wrench, Lightbulb, Landmark,
   FileEdit, Handshake, PackageCheck,
-  Lock, ShieldCheck, Bot, Mic,
-  TrendingUp, MapPin, Megaphone, CheckCircle2, ArrowRight, MessageCircle, ExternalLink, Mail,
+  Lock, Mic,
+  TrendingUp, MapPin, Megaphone, CheckCircle2, ArrowRight, ArrowUpRight, MessageCircle, ExternalLink, Mail, Sun,
 } from "lucide-react";
 
 // Lazy-loaded: Dashboard (and the Supabase client it uses) should only be
@@ -161,8 +161,19 @@ const testimonials = [
   },
 ];
 
-// A single shared IntersectionObserver serves every <Reveal>, instead of each
-// one creating its own — cuts down on setup/teardown work on the main thread.
+
+// Existing service pages that map directly onto a service (routes unchanged).
+const serviceLinks = {
+  "Full Documentation": "/project-documentation-help",
+  "PPT & Presentation": "/ppt-presentation-help",
+  "Career & Placement Guidance": "/career-placement-guidance",
+};
+
+const pad = (i) => String(i + 1).padStart(2, "0");
+
+// A single shared IntersectionObserver serves every <Reveal>. Reveal is used
+// sparingly (section headers only) and content is never left hidden if the
+// observer is unavailable or the user prefers reduced motion.
 let sharedRevealObserver = null;
 const revealCallbacks = new WeakMap();
 
@@ -179,18 +190,23 @@ function getSharedRevealObserver() {
         }
       });
     },
-    { threshold: 0.15 }
+    { threshold: 0.01, rootMargin: "0px 0px -6% 0px" }
   );
   return sharedRevealObserver;
 }
 
 function useReveal() {
   const ref = useRef(null);
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(
+    () =>
+      typeof window === "undefined" ||
+      typeof IntersectionObserver === "undefined" ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
 
   useEffect(() => {
     const el = ref.current;
-    if (!el) return;
+    if (!el || visible) return;
     const observer = getSharedRevealObserver();
     revealCallbacks.set(el, () => setVisible(true));
     observer.observe(el);
@@ -198,360 +214,333 @@ function useReveal() {
       observer.unobserve(el);
       revealCallbacks.delete(el);
     };
-  }, []);
+  }, [visible]);
 
   return [ref, visible];
 }
 
-function TrustStrip() {
-  const items = [
-    { icon: Lock, text: "100% Original Work" },
-    { icon: Zap, text: "24–48hr Turnaround" },
-    { icon: GraduationCap, text: "Engineer-Led Guidance" },
-    { icon: ShieldCheck, text: "Secure Data Handling" },
-  ];
-  return (
-    <div className="trust-strip">
-      {items.map((t) => (
-        <div key={t.text} className="trust-item">
-          <span className="trust-icon"><t.icon size={16} strokeWidth={2.4} /></span>
-          <span>{t.text}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function Reveal({ children, className = "", delay = 0 }) {
+function Reveal({ children, className = "" }) {
   const [ref, visible] = useReveal();
   return (
-    <div
-      ref={ref}
-      className={`reveal ${visible ? "reveal-in" : ""} ${className}`}
-      style={{ transitionDelay: `${delay}ms` }}
-    >
+    <div ref={ref} className={`reveal ${visible ? "reveal-in" : ""} ${className}`}>
       {children}
     </div>
   );
 }
 
-function CursorGlow() {
-  const glowRef = useRef(null);
+// Left-aligned section header with a numbered technical label ("01 — BRANCHES").
+// `n` is only passed on the landing page; reused sections on inner pages omit it.
+function SectionHead({ n, label, title, titleId, children }) {
+  return (
+    <Reveal className="section-head">
+      <p className="label">
+        {n && (<><span className="label-num">{n}</span>{" — "}</>)}
+        {label}
+      </p>
+      <h2 id={titleId}>{title}</h2>
+      {children && <p className="section-sub">{children}</p>}
+    </Reveal>
+  );
+}
 
-  useEffect(() => {
-    if (window.matchMedia("(pointer: coarse)").matches) return;
-    let frame = null;
-    let pending = null;
-    const move = (e) => {
-      pending = e;
-      if (frame) return;
-      frame = requestAnimationFrame(() => {
-        if (glowRef.current && pending) {
-          glowRef.current.style.transform = `translate(${pending.clientX - 200}px, ${pending.clientY - 200}px)`;
-        }
-        frame = null;
-      });
-    };
-    window.addEventListener("mousemove", move, { passive: true });
-    return () => {
-      window.removeEventListener("mousemove", move);
-      if (frame) cancelAnimationFrame(frame);
-    };
-  }, []);
-
-  return <div className="cursor-glow" ref={glowRef}></div>;
+function PageHero({ label, title, sub, marker }) {
+  return (
+    <section className="page-hero">
+      <div className="container">
+        <p className="label">
+          {marker && <span className="swatch" style={{ "--branch": marker }} aria-hidden="true"></span>}
+          {label}
+        </p>
+        <h1>{title}</h1>
+        <p className="page-sub">{sub}</p>
+      </div>
+    </section>
+  );
 }
 
 function Navbar({ active, setActive }) {
-  const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const headerRef = useRef(null);
 
+  // Close the mobile menu with Escape or a tap/click outside it.
   useEffect(() => {
-    const fn = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", fn);
-    return () => window.removeEventListener("scroll", fn);
-  }, []);
+    if (!mobileOpen) return;
+    const onKey = (e) => { if (e.key === "Escape") setMobileOpen(false); };
+    const onDown = (e) => {
+      if (headerRef.current && !headerRef.current.contains(e.target)) setMobileOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("pointerdown", onDown);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("pointerdown", onDown);
+    };
+  }, [mobileOpen]);
 
   const links = ["Home", "Branches", "Services", "About", "Projects", "Contact"];
 
   return (
-    <nav className={`navbar ${scrolled ? "scrolled" : ""}`}>
-      <div className="nav-logo">
-        <img src="/logo.png" alt="EngiAssist logo" className="logo-icon-img" />
-        <span className="logo-text">EngiAssist</span>
-      </div>
-      <ul className={`nav-links ${mobileOpen ? "open" : ""}`}>
-        {links.map((l) => (
-          <li key={l}>
-            <a
-              href={l === "About" ? "/about" : l === "Home" ? "/" : `/#${l.toLowerCase()}`}
-              className={active === l ? "active" : ""}
-              onClick={() => { setActive(l); setMobileOpen(false); }}
-            >
-              {l}
+    <>
+      <a className="skip-link" href="#main">Skip to main content</a>
+      <header className="site-header" ref={headerRef}>
+        <nav className="navbar" aria-label="Primary">
+          <a href="/" className="nav-logo" aria-label="EngiAssist home">
+            <img src="/logo-72.png" width="34" height="34" alt="" className="logo-icon-img" />
+            <span className="logo-text">EngiAssist</span>
+          </a>
+          <ul id="primary-menu" className={`nav-links ${mobileOpen ? "open" : ""}`}>
+            {links.map((l) => (
+              <li key={l}>
+                <a
+                  href={l === "About" ? "/about" : l === "Home" ? "/" : `/#${l.toLowerCase()}`}
+                  className={active === l ? "active" : ""}
+                  aria-current={active === l && (l === "Home" || l === "About") ? "page" : undefined}
+                  onClick={() => { setActive(l); setMobileOpen(false); }}
+                >
+                  {l}
+                </a>
+              </li>
+            ))}
+            <li className="nav-divider-item">
+              <a href="/Engisun" className="nav-solar"><Sun size={14} aria-hidden="true" /> EngiSun</a>
+            </li>
+          </ul>
+          <div className="nav-actions">
+            <a href="/#contact" className="btn btn-primary btn-sm" onClick={() => setMobileOpen(false)}>
+              Get Help Now
             </a>
-          </li>
-        ))}
-        <li>
-          <a href="/Engisun" className="nav-solar">☀ EngiSun</a>
-        </li>
-      </ul>
-      <div className="nav-actions">
-        <button
-          className="btn-nav-cta"
-          onClick={() => {
-            const el = document.getElementById("contact");
-            if (el) el.scrollIntoView({ behavior: "smooth" });
-            else window.location.href = "/#contact";
-          }}
-        >
-          Get Help Now
-        </button>
-        <button className="hamburger" onClick={() => setMobileOpen(!mobileOpen)}>
-          <span></span><span></span><span></span>
-        </button>
-      </div>
-    </nav>
+            <button
+              type="button"
+              className="hamburger"
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileOpen}
+              aria-controls="primary-menu"
+              onClick={() => setMobileOpen(!mobileOpen)}
+            >
+              <span></span><span></span><span></span>
+            </button>
+          </div>
+        </nav>
+      </header>
+    </>
   );
 }
 
 function Hero() {
-  const [typed, setTyped] = useState("");
-  const phrases = ["Computer Science Projects", "Mechanical Design Help", "Civil Engineering Docs", "Electronics & IoT Ideas", "AI/ML Project Guidance"];
-  const phraseIdx = useRef(0);
-  const charIdx = useRef(0);
-  const deleting = useRef(false);
-
-  useEffect(() => {
-    const tick = () => {
-      const current = phrases[phraseIdx.current];
-      if (!deleting.current) {
-        setTyped(current.slice(0, charIdx.current + 1));
-        charIdx.current++;
-        if (charIdx.current === current.length) {
-          deleting.current = true;
-          setTimeout(tick, 1800);
-          return;
-        }
-      } else {
-        setTyped(current.slice(0, charIdx.current - 1));
-        charIdx.current--;
-        if (charIdx.current === 0) {
-          deleting.current = false;
-          phraseIdx.current = (phraseIdx.current + 1) % phrases.length;
-        }
-      }
-      setTimeout(tick, deleting.current ? 40 : 65);
-    };
-    const t = setTimeout(tick, 800);
-    return () => clearTimeout(t);
-  }, []);
-
+  // Existing capability labels from the previous trust strip, shown once.
+  const facts = ["100% Original Work", "24–48hr Turnaround", "Engineer-Led Guidance", "Secure Data Handling"];
   return (
-    <section className="hero" id="home">
-      <div className="hero-bg">
-        <div className="grid-overlay"></div>
-        <div className="orb orb1"></div>
-        <div className="orb orb2"></div>
-        <div className="orb orb3"></div>
-      </div>
-      <div className="hero-content">
-        <div className="hero-badge"><GraduationCap size={15} strokeWidth={2.4} /> Engineering Help, Made Simple</div>
-        <h1 className="hero-title">
-          Your Ultimate Guide for<br />
-          <span className="typed-line">
-            <span className="typed-text">{typed}</span>
-            <span className="cursor">|</span>
-          </span>
-        </h1>
-        <p className="hero-sub">
-          Explore project ideas, get guidance, and find useful resources for your
-          engineering journey.
-        </p>
-        <div className="hero-btns">
-          <button
-            className="btn-primary"
-            onClick={() => document.getElementById("branches").scrollIntoView({ behavior: "smooth" })}
-          >
-            Explore Your Branch <ArrowRight size={16} strokeWidth={2.4} />
-          </button>
-          <button
-            className="btn-secondary"
-            onClick={() => document.getElementById("projects").scrollIntoView({ behavior: "smooth" })}
-          >
-            View Projects ↗
-          </button>
+    <section className="hero" id="home" aria-labelledby="hero-title">
+      <div className="container hero-grid">
+        <div className="hero-copy">
+          <p className="eyebrow">Engineering Help, Made Simple</p>
+          <h1 className="hero-title" id="hero-title">Engineering project help, from first idea to viva.</h1>
+          <p className="hero-sub">
+            EngiAssist helps B.Tech, BE and Diploma students with project ideas, working code
+            and design files, IEEE-format documentation, presentations and viva preparation —
+            across six engineering branches.
+          </p>
+          <div className="hero-actions">
+            <a className="btn btn-primary" href="#branches">Explore Your Branch <ArrowRight size={16} strokeWidth={2.2} aria-hidden="true" /></a>
+            <a className="btn btn-secondary" href="#projects">View Projects <ArrowUpRight size={16} strokeWidth={2.2} aria-hidden="true" /></a>
+          </div>
+          <ul className="hero-facts">
+            {facts.map((f) => <li key={f}>{f}</li>)}
+          </ul>
         </div>
-        <div className="hero-stats">
-          {stats.map((s) => (
-            <div key={s.label} className="stat-chip">
-              <span className="stat-num"><s.icon size={18} strokeWidth={2.2} /></span>
-              <span className="stat-label">{s.label}</span>
-            </div>
-          ))}
-        </div>
-        <TrustStrip />
-      </div>
-      <div className="hero-visual">
-        <div className="floating-card fc1"><Cpu size={15} strokeWidth={2.2} /> CS Project Help</div>
-        <div className="floating-card fc2"><Cog size={15} strokeWidth={2.2} /> Mech CAD Design</div>
-        <div className="floating-card fc3"><Bot size={15} strokeWidth={2.2} /> AI/ML Models</div>
-        <div className="floating-card fc4"><Building2 size={15} strokeWidth={2.2} /> Civil Reports</div>
-        <div className="center-glow">
-          <Zap size={34} strokeWidth={2.2} />
-        </div>
+        <aside className="branch-index" aria-label="Supported engineering branches">
+          <div className="bi-head">
+            <span>Branch index</span>
+            <span>{String(branches.length).padStart(2, "0")} disciplines</span>
+          </div>
+          <ol>
+            {branches.map((b, i) => (
+              <li key={b.id} className="bi-row" style={{ "--branch": b.color }}>
+                <span className="bi-num">{pad(i)}</span>
+                <div>
+                  <h3 className="bi-name"><span className="swatch" aria-hidden="true"></span>{b.label}</h3>
+                  <p className="bi-desc">{b.desc}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </aside>
       </div>
     </section>
   );
 }
 
-function Branches() {
+function Branches({ n }) {
   const [active, setActive] = useState(null);
 
   return (
-    <section className="branches-section" id="branches">
-      <Reveal className="section-header">
-        <span className="section-tag">All Branches</span>
-        <h2>Choose Your Engineering Branch</h2>
-        <p>Specialized project guidance for every discipline</p>
-      </Reveal>
-      <div className="branches-grid">
-        {branches.map((b) => (
-          <div
-            key={b.id}
-            className={`branch-card ${active === b.id ? "active" : ""}`}
-            style={{ "--accent": b.color }}
-            onClick={() => setActive(active === b.id ? null : b.id)}
-          >
-            <div className="branch-icon"><b.icon size={28} strokeWidth={2} /></div>
-            <h3>{b.label}</h3>
-            <p>{b.desc}</p>
-            {active === b.id && (
-              <div className="branch-projects">
-                <p className="proj-title">Popular Projects:</p>
-                <ul>
-                  {b.projects.map((p) => (
-                    <li key={p}>→ {p}</li>
-                  ))}
-                </ul>
-                <button
-                  className="branch-cta"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    document.getElementById("contact").scrollIntoView({ behavior: "smooth" });
-                  }}
-                >
-                  Get Help with {b.label} Projects
-                </button>
+    <section className="section section-alt" id="branches" aria-labelledby="branches-title">
+      <div className="container">
+        <SectionHead n={n} label="Branches" title="Choose Your Engineering Branch" titleId="branches-title">
+          Specialized project guidance for every discipline
+        </SectionHead>
+        <ul className="rule-list">
+          {branches.map((b, i) => {
+            const open = active === b.id;
+            return (
+              <li key={b.id} className={open ? "is-open" : ""} style={{ "--branch": b.color }}>
+                <h3 className="branch-heading">
+                  <button
+                    type="button"
+                    className="branch-toggle"
+                    id={`branch-btn-${b.id}`}
+                    aria-expanded={open}
+                    aria-controls={`branch-panel-${b.id}`}
+                    onClick={() => setActive(open ? null : b.id)}
+                  >
+                    <span className="row-num">{pad(i)}</span>
+                    <span className="branch-name"><span className="swatch" aria-hidden="true"></span>{b.label}</span>
+                    <span className="branch-desc">{b.desc}</span>
+                    <span className="toggle-mark" aria-hidden="true"></span>
+                  </button>
+                </h3>
+                <div className="disclosure" id={`branch-panel-${b.id}`} role="region" aria-labelledby={`branch-btn-${b.id}`}>
+                  <div className="disclosure-inner">
+                    <div className="disclosure-body">
+                      <span className="mono-label">Popular projects</span>
+                      <ul className="topic-list">
+                        {b.projects.map((p) => <li key={p}>{p}</li>)}
+                      </ul>
+                      <div className="branch-actions">
+                        <a className="btn btn-secondary btn-sm" href="/#contact">
+                          Get Help with {b.label} Projects <ArrowRight size={14} aria-hidden="true" />
+                        </a>
+                        <a className="text-link" href={branchSeoContent[b.id].path}>
+                          About {b.label} project help <ArrowRight size={14} aria-hidden="true" />
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
+function Services({ n }) {
+  const career = services.find((s) => s.title.startsWith("Career"));
+  const core = services.filter((s) => s !== career);
+  const careerItems = serviceSeoPages["career-placement-guidance"].items;
+
+  return (
+    <section className="section" id="services" aria-labelledby="services-title">
+      <div className="container">
+        <SectionHead n={n} label="Services" title="Everything You Need to Excel" titleId="services-title">
+          Complete engineering project support from idea to submission
+        </SectionHead>
+        <ul className="service-grid">
+          {core.map((s) => (
+            <li key={s.title}>
+              <div className="service-row">
+                <span className="service-icon" aria-hidden="true"><s.icon size={22} strokeWidth={1.75} /></span>
+                <div>
+                  <h3>{s.title}</h3>
+                  <p>{s.desc}</p>
+                  {serviceLinks[s.title] && (
+                    <a className="text-link" href={serviceLinks[s.title]}>Learn more <ArrowRight size={14} aria-hidden="true" /></a>
+                  )}
+                </div>
               </div>
-            )}
-            <div className="branch-glow"></div>
+            </li>
+          ))}
+        </ul>
+
+        <div className="career-feature">
+          <div className="career-main">
+            <span className="mono-label">Featured</span>
+            <h3><career.icon size={24} strokeWidth={1.75} aria-hidden="true" /> {career.title}</h3>
+            <p className="career-lede">
+              Explore project ideas, get guidance, and find resources to support your engineering journey — from projects to placements.
+            </p>
+            <p>{career.desc}</p>
+            <div className="career-actions">
+              <a className="btn btn-primary" href={serviceLinks[career.title]}>Explore Career Guidance <ArrowRight size={16} aria-hidden="true" /></a>
+              <a className="btn btn-secondary" href="/#contact">Ask a Question</a>
+            </div>
           </div>
-        ))}
+          <ul className="career-items" aria-label="Career guidance topics">
+            {careerItems.map((c, i) => <li key={c} data-n={pad(i)}>{c}</li>)}
+          </ul>
+        </div>
       </div>
     </section>
   );
 }
 
-function Services() {
+function HowItWorks({ n }) {
   return (
-    <section className="services-section" id="services">
-      <Reveal className="section-header light">
-        <span className="section-tag">What We Offer</span>
-        <h2>Everything You Need to Excel</h2>
-        <p>Complete engineering project support from idea to submission</p>
-      </Reveal>
-      <div className="services-grid">
-        {services.map((s, i) => (
-          <Reveal key={s.title} delay={i * 60} className="service-card">
-            <div className="service-icon"><s.icon size={26} strokeWidth={2} /></div>
-            <h3>{s.title}</h3>
-            <p>{s.desc}</p>
-          </Reveal>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function HowItWorks() {
-  return (
-    <section className="how-section" id="how-it-works">
-      <Reveal className="section-header light">
-        <span className="section-tag">Simple Process</span>
-        <h2>How EngiAssist Works</h2>
-        <p>From idea to submission in 4 clear steps</p>
-      </Reveal>
-      <div className="how-grid">
-        {howItWorksSteps.map((s, i) => (
-          <Reveal key={s.num} delay={i * 100} className="how-card-wrap">
-            <div className="how-card">
-              <span className="how-num">{s.num}</span>
-              <div className="how-icon"><s.icon size={24} strokeWidth={2} /></div>
+    <section className="section" id="how-it-works" aria-labelledby="how-title">
+      <div className="container">
+        <SectionHead n={n} label="How it works" title="How EngiAssist Works" titleId="how-title">
+          From idea to submission in 4 clear steps
+        </SectionHead>
+        <ol className="rail">
+          {howItWorksSteps.map((s) => (
+            <li key={s.num} className="rail-step">
+              <span className="rail-num">{s.num}</span>
               <h3>{s.title}</h3>
               <p>{s.desc}</p>
-            </div>
-            {i < howItWorksSteps.length - 1 && <div className="how-connector"></div>}
-          </Reveal>
-        ))}
+            </li>
+          ))}
+        </ol>
       </div>
     </section>
   );
 }
 
-function FixMyProject() {
+function FixMyProject({ n }) {
   return (
-    <section className="fix-section" id="fix-my-project">
-      <Reveal className="section-header">
-        <span className="section-tag">Already In Progress?</span>
-        <h2>Your Project Doesn't Have To Start From Zero</h2>
-        <p>Already have a project? We can help you fix, finish, or explain it.</p>
-      </Reveal>
-      <Reveal className="fix-wrapper" delay={100}>
-        <div className="fix-chips">
-          {fixItems.map((f) => (
-            <span key={f} className="fix-chip">{f}</span>
+    <section className="section section-alt" id="fix-my-project" aria-labelledby="fix-title">
+      <div className="container split">
+        <div>
+          <SectionHead n={n} label="Already in progress?" title="Your Project Doesn't Have To Start From Zero" titleId="fix-title">
+            Already have a project? We can help you fix, finish, or explain it.
+          </SectionHead>
+          <a className="btn btn-primary" href="/#contact">Get Help With My Existing Project <ArrowRight size={16} aria-hidden="true" /></a>
+        </div>
+        <ul className="checklist" aria-label="What we can help with">
+          {fixItems.map((f) => <li key={f}>{f}</li>)}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
+// NOTE: testimonial content is unchanged from the repository and has not been
+// verified as genuine — see the final report.
+function Testimonials({ n }) {
+  return (
+    <section className="section" id="testimonials" aria-labelledby="testimonials-title">
+      <div className="container">
+        <SectionHead n={n} label="Student voices" title="What Students Say" titleId="testimonials-title">
+          Real feedback from students who got their projects done right
+        </SectionHead>
+        <div className="quote-grid">
+          {testimonials.map((t) => (
+            <figure key={t.name} className="quote">
+              <blockquote><p>{t.quote}</p></blockquote>
+              <figcaption>
+                <span className="quote-name">{t.name}</span>
+                <span className="quote-meta">{t.branch}</span>
+              </figcaption>
+            </figure>
           ))}
         </div>
-        <button
-          className="btn-primary"
-          onClick={() => document.getElementById("contact").scrollIntoView({ behavior: "smooth" })}
-        >
-          Get Help With My Existing Project →
-        </button>
-      </Reveal>
-    </section>
-  );
-}
-
-function Testimonials() {
-  return (
-    <section className="testimonials-section">
-      <Reveal className="section-header">
-        <span className="section-tag">Student Voices</span>
-        <h2>What Students Say</h2>
-        <p>Real feedback from students who got their projects done right</p>
-      </Reveal>
-      <div className="testimonials-grid">
-        {testimonials.map((t, i) => (
-          <Reveal key={t.name} delay={i * 100} className="testimonial-card">
-            <div className="testimonial-quote-mark">"</div>
-            <p className="testimonial-text">{t.quote}</p>
-            <div className="testimonial-author">
-              <div className="testimonial-avatar">{t.name.charAt(0)}</div>
-              <div>
-                <div className="testimonial-name">{t.name}</div>
-                <div className="testimonial-branch">{t.branch}</div>
-              </div>
-            </div>
-          </Reveal>
-        ))}
       </div>
     </section>
   );
 }
 
-function FAQ() {
+function FAQ({ n }) {
   const [open, setOpen] = useState(0);
 
   useEffect(() => {
@@ -573,89 +562,92 @@ function FAQ() {
   }, []);
 
   return (
-    <section className="faq-section" id="faq">
-      <Reveal className="section-header light">
-        <span className="section-tag">Got Questions?</span>
-        <h2>Frequently Asked Questions</h2>
-        <p>Everything students usually ask before getting started</p>
-      </Reveal>
-      <div className="faq-list">
-        {faqs.map((f, i) => (
-          <Reveal key={f.q} delay={i * 60} className="faq-item-wrap">
-            <div className={`faq-item ${open === i ? "faq-open" : ""}`}>
-              <button className="faq-question" onClick={() => setOpen(open === i ? -1 : i)}>
-                <span>{f.q}</span>
-                <span className="faq-toggle">{open === i ? "−" : "+"}</span>
-              </button>
-              <div className="faq-answer">
-                <p>{f.a}</p>
-              </div>
-            </div>
-          </Reveal>
-        ))}
+    <section className="section section-alt" id="faq" aria-labelledby="faq-title">
+      <div className="container">
+        <SectionHead n={n} label="Questions" title="Frequently Asked Questions" titleId="faq-title">
+          Everything students usually ask before getting started
+        </SectionHead>
+        <ul className="faq-list">
+          {faqs.map((f, i) => {
+            const isOpen = open === i;
+            return (
+              <li key={f.q} className={`faq-item ${isOpen ? "is-open" : ""}`}>
+                <h3>
+                  <button
+                    type="button"
+                    className="faq-question"
+                    id={`faq-q-${i}`}
+                    aria-expanded={isOpen}
+                    aria-controls={`faq-a-${i}`}
+                    onClick={() => setOpen(isOpen ? -1 : i)}
+                  >
+                    <span>{f.q}</span>
+                    <span className="toggle-mark" aria-hidden="true"></span>
+                  </button>
+                </h3>
+                <div className="disclosure" id={`faq-a-${i}`} role="region" aria-labelledby={`faq-q-${i}`}>
+                  <div className="disclosure-inner">
+                    <div className="disclosure-body"><p>{f.a}</p></div>
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
       </div>
     </section>
   );
 }
+
 function AboutUs() {
   return (
-    <section className="about-section" id="about">
-      <Reveal className="section-header">
-        <span className="section-tag">Who We Are</span>
-        <h2>Meet the Founder</h2>
-        <p>Built by an engineer, for engineers</p>
-      </Reveal>
-
-      <div className="about-wrapper">
-        <div className="founder-card">
-          <div className="founder-glow"></div>
-          <div className="founder-avatar">
-            <span>PP</span>
+    <section className="section section-alt" id="about" aria-labelledby="about-title">
+      <div className="container">
+        <SectionHead label="Who we are" title="Meet the Founder" titleId="about-title">
+          Built by an engineer, for engineers
+        </SectionHead>
+        <div className="about-grid">
+          <div className="founder">
+            <div className="founder-avatar" aria-hidden="true">PP</div>
+            <h3 className="founder-name">Pratik Patil</h3>
+            <p className="founder-role">CEO &amp; Founder, EngiAssist</p>
+            <ul className="founder-tags">
+              <li><Cog size={14} strokeWidth={2} aria-hidden="true" /> Mechanical Engineer</li>
+              <li><TrendingUp size={14} strokeWidth={2} aria-hidden="true" /> Marketing Manager @ In Solar industry</li>
+              <li><MapPin size={14} strokeWidth={2} aria-hidden="true" /> Jalgaon, Maharashtra</li>
+            </ul>
+            <p className="founder-bio">
+              Pratik founded EngiAssist to give engineering students across every
+              branch the same project guidance and support he wished he'd had —
+              combining hands-on mechanical engineering expertise with real-world
+              marketing and leadership experience In Solar industry. Based in
+              Jalgaon, Maharashtra, he personally works with students on their
+              mini and major projects.
+            </p>
+            <a
+              href="https://www.linkedin.com/in/pratik-patil-7347512b2/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-secondary btn-sm"
+            >
+              <ExternalLink size={14} strokeWidth={2} aria-hidden="true" /> Connect on LinkedIn
+            </a>
           </div>
-          <h3 className="founder-name">Pratik Patil</h3>
-          <p className="founder-role">CEO &amp; Founder, EngiAssist</p>
 
-          <div className="founder-badges">
-            <span className="founder-badge"><Cog size={13} strokeWidth={2.2} /> Mechanical Engineer</span>
-            <span className="founder-badge"><TrendingUp size={13} strokeWidth={2.2} /> Marketing Manager @ In Solar industry</span>
-            <span className="founder-badge"><MapPin size={13} strokeWidth={2.2} /> Jalgaon, Maharashtra</span>
-          </div>
-
-          <a
-            href="https://www.linkedin.com/in/pratik-patil-7347512b2/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="founder-linkedin"
-          >
-            <ExternalLink size={15} strokeWidth={2.2} /> Connect on LinkedIn
-          </a>
-
-          <p className="founder-bio">
-            Pratik founded EngiAssist to give engineering students across every
-            branch the same project guidance and support he wished he'd had —
-            combining hands-on mechanical engineering expertise with real-world
-            marketing and leadership experience In Solar industry. Based in
-            Jalgaon, Maharashtra, he personally works with students on their
-            mini and major projects.
-          </p>
-        </div>
-
-        <div className="about-highlights">
-          <div className="about-highlight-card">
-            <div className="about-highlight-icon"><GraduationCap size={22} strokeWidth={2} /></div>
-            <h4>Engineer-Led</h4>
-            <p>Every project reviewed with real engineering rigor, not just templates.</p>
-          </div>
-          <div className="about-highlight-card">
-            <div className="about-highlight-icon"><Megaphone size={22} strokeWidth={2} /></div>
-            <h4>Marketing-Backed</h4>
-            <p>Presentation and communication polish from real industry marketing experience.</p>
-          </div>
-          <div className="about-highlight-card">
-            <div className="about-highlight-icon"><MapPin size={22} strokeWidth={2} /></div>
-            <h4>Proudly Local</h4>
-            <p>Based in Jalgaon, Maharashtra — supporting students across India.</p>
-          </div>
+          <ul className="about-points">
+            <li>
+              <GraduationCap size={22} strokeWidth={1.75} aria-hidden="true" />
+              <div><h4>Engineer-Led</h4><p>Every project reviewed with real engineering rigor, not just templates.</p></div>
+            </li>
+            <li>
+              <Megaphone size={22} strokeWidth={1.75} aria-hidden="true" />
+              <div><h4>Marketing-Backed</h4><p>Presentation and communication polish from real industry marketing experience.</p></div>
+            </li>
+            <li>
+              <MapPin size={22} strokeWidth={1.75} aria-hidden="true" />
+              <div><h4>Proudly Local</h4><p>Based in Jalgaon, Maharashtra — supporting students across India.</p></div>
+            </li>
+          </ul>
         </div>
       </div>
     </section>
@@ -666,68 +658,63 @@ function AboutPage() {
   const [active, setActive] = useState("About");
   return (
     <div className="app">
-      <CursorGlow />
       <Navbar active={active} setActive={setActive} />
-      <section className="about-hero">
-        <div className="hero-bg">
-          <div className="grid-overlay"></div>
-          <div className="orb orb1"></div>
-          <div className="orb orb2"></div>
-        </div>
-        <div className="about-hero-content">
-          <span className="hero-badge"><GraduationCap size={15} strokeWidth={2.4} /> The Story Behind EngiAssist</span>
-          <h1 className="about-hero-title">About EngiAssist</h1>
-          <p className="hero-sub">
-            Built by an engineer who understands exactly what students need —
-            not just a finished project, but real understanding.
-          </p>
-        </div>
-      </section>
-      <AboutUs />
-      <Testimonials />
+      <main id="main" tabIndex={-1}>
+        <PageHero
+          label="The story behind EngiAssist"
+          title="About EngiAssist"
+          sub="Built by an engineer who understands exactly what students need — not just a finished project, but real understanding."
+        />
+        <AboutUs />
+        <Testimonials />
+      </main>
       <Footer />
     </div>
   );
 }
 
-function Projects() {
+// Ruled list of project topics for one branch (shared by the landing page and branch pages).
+function TopicTable({ branch }) {
+  return (
+    <ol className="topic-table">
+      {branch.projects.map((p, i) => (
+        <li key={p} className="topic-row">
+          <span className="row-num">{pad(i)}</span>
+          <span className="topic-name">{p}</span>
+          <span className="topic-branch">{branch.label}</span>
+          <a className="text-link" href="/#contact">Get This Project <ArrowRight size={14} aria-hidden="true" /></a>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+function Projects({ n }) {
   const [selectedBranch, setSelectedBranch] = useState("cs");
   const current = branches.find((b) => b.id === selectedBranch);
 
   return (
-    <section className="projects-section" id="projects">
-      <Reveal className="section-header">
-        <span className="section-tag">Project Ideas</span>
-        <h2>Explore Project Topics</h2>
-        <p>Handpicked project ideas for each engineering branch</p>
-      </Reveal>
-      <div className="proj-tabs">
-        {branches.map((b) => (
-          <button
-            key={b.id}
-            className={`proj-tab ${selectedBranch === b.id ? "active" : ""}`}
-            style={selectedBranch === b.id ? { "--tab-color": b.color } : {}}
-            onClick={() => setSelectedBranch(b.id)}
-          >
-            <b.icon size={15} strokeWidth={2.2} /> {b.label}
-          </button>
-        ))}
-      </div>
-      <div className="proj-cards" style={{ "--accent": current.color }}>
-        {current.projects.map((p, i) => (
-          <div key={p} className="proj-card" style={{ animationDelay: `${i * 0.07}s` }}>
-            <div className="proj-icon-badge"><current.icon size={22} strokeWidth={2} /></div>
-            <div className="proj-number">0{i + 1}</div>
-            <div className="proj-name">{p}</div>
-            <div className="proj-branch"><current.icon size={13} strokeWidth={2.2} /> {current.label}</div>
+    <section className="section section-alt" id="projects" aria-labelledby="projects-title">
+      <div className="container">
+        <SectionHead n={n} label="Project ideas" title="Explore Project Topics" titleId="projects-title">
+          Handpicked project ideas for each engineering branch
+        </SectionHead>
+        <div className="tabs" role="group" aria-label="Show project topics for a branch">
+          {branches.map((b) => (
             <button
-              className="proj-btn"
-              onClick={() => document.getElementById("contact").scrollIntoView({ behavior: "smooth" })}
+              key={b.id}
+              type="button"
+              className="tab"
+              aria-pressed={selectedBranch === b.id}
+              style={{ "--branch": b.color }}
+              onClick={() => setSelectedBranch(b.id)}
             >
-              Get This Project →
+              <span className="swatch" aria-hidden="true"></span>{b.label}
             </button>
-          </div>
-        ))}
+          ))}
+        </div>
+        <p className="label tab-status" aria-live="polite">Topics — {current.label}</p>
+        <TopicTable branch={current} />
       </div>
     </section>
   );
@@ -747,7 +734,7 @@ function makeLeadCode() {
   return `EA-${n}`;
 }
 
-function Contact() {
+function Contact({ n }) {
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -829,78 +816,106 @@ Please contact me regarding my project.`;
   };
 
   return (
-    <section className="contact-section" id="contact">
-      <Reveal className="section-header light">
-        <span className="section-tag">Get Started</span>
-        <h2>Request Project Help</h2>
-        <p>Tell us your branch and project needs — we'll guide you step by step</p>
-      </Reveal>
-      <div className="contact-wrapper">
-        <div className="contact-info">
-          <h3>Why Choose EngiAssist?</h3>
-          <ul>
-            <li><CheckCircle2 size={16} strokeWidth={2.2} /> Guidance for all 6 engineering branches</li>
-            <li><CheckCircle2 size={16} strokeWidth={2.2} /> Complete project from scratch or partial help</li>
-            <li><CheckCircle2 size={16} strokeWidth={2.2} /> IEEE-format documentation & reports</li>
-            <li><CheckCircle2 size={16} strokeWidth={2.2} /> Working source code & design files</li>
-            <li><CheckCircle2 size={16} strokeWidth={2.2} /> Presentation & PPT preparation</li>
-            <li><CheckCircle2 size={16} strokeWidth={2.2} /> Fast turnaround — results in 24–48 hours</li>
-          </ul>
-          <div className="contact-badges">
-            <span><Zap size={13} strokeWidth={2.2} /> Fast Delivery</span>
-            <span><Lock size={13} strokeWidth={2.2} /> 100% Original</span>
+    <section className="section" id="contact" aria-labelledby="contact-title">
+      <div className="container">
+        <SectionHead n={n} label="Request help" title="Request Project Help" titleId="contact-title">
+          Tell us your branch and project needs — we'll guide you step by step
+        </SectionHead>
+        <div className="contact-grid">
+          <div className="contact-info">
+            <h3>Why Choose EngiAssist?</h3>
+            <ul className="check-list">
+              <li><CheckCircle2 size={16} strokeWidth={2} aria-hidden="true" /> Guidance for all 6 engineering branches</li>
+              <li><CheckCircle2 size={16} strokeWidth={2} aria-hidden="true" /> Complete project from scratch or partial help</li>
+              <li><CheckCircle2 size={16} strokeWidth={2} aria-hidden="true" /> IEEE-format documentation &amp; reports</li>
+              <li><CheckCircle2 size={16} strokeWidth={2} aria-hidden="true" /> Working source code &amp; design files</li>
+              <li><CheckCircle2 size={16} strokeWidth={2} aria-hidden="true" /> Presentation &amp; PPT preparation</li>
+              <li><CheckCircle2 size={16} strokeWidth={2} aria-hidden="true" /> Fast turnaround — results in 24–48 hours</li>
+            </ul>
+            <ul className="contact-badges">
+              <li><Zap size={13} strokeWidth={2} aria-hidden="true" /> Fast Delivery</li>
+              <li><Lock size={13} strokeWidth={2} aria-hidden="true" /> 100% Original</li>
+            </ul>
+            <a href="mailto:Contact@Engiassist.in" className="text-link contact-email">
+              <Mail size={16} strokeWidth={2} aria-hidden="true" /> Contact@Engiassist.in
+            </a>
           </div>
-          <a href="mailto:Contact@Engiassist.in" className="contact-email">
-            <Mail size={15} strokeWidth={2.2} /> Contact@Engiassist.in
-          </a>
-        </div>
 
-        {!submitted ? (
-          <form className="contact-form" onSubmit={submit}>
-            <div className="form-row">
-              <input name="name" placeholder="Your Full Name *" value={form.name} onChange={handle} required />
-              <input name="phone" type="tel" placeholder="Phone / WhatsApp Number *" value={form.phone} onChange={handle} required />
+          {!submitted ? (
+            <form className="contact-form" onSubmit={submit}>
+              <p className="form-note">Fields marked <span className="req" aria-hidden="true">*</span><span className="sr-only">with an asterisk</span> are required.</p>
+              <div className="form-row">
+                <div className="field">
+                  <label htmlFor="f-name">Full name <span className="req" aria-hidden="true">*</span></label>
+                  <input id="f-name" name="name" autoComplete="name" value={form.name} onChange={handle} required />
+                </div>
+                <div className="field">
+                  <label htmlFor="f-phone">Phone / WhatsApp number <span className="req" aria-hidden="true">*</span></label>
+                  <input id="f-phone" name="phone" type="tel" autoComplete="tel" value={form.phone} onChange={handle} required />
+                </div>
+              </div>
+              <div className="form-row">
+                <div className="field">
+                  <label htmlFor="f-email">Email address <span className="req" aria-hidden="true">*</span></label>
+                  <input id="f-email" name="email" type="email" autoComplete="email" value={form.email} onChange={handle} required />
+                </div>
+                <div className="field">
+                  <label htmlFor="f-branch">Branch</label>
+                  <select id="f-branch" name="branch" value={form.branch} onChange={handle}>
+                    {branches.map((b) => (
+                      <option key={b.id} value={b.id}>{b.label}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="form-row">
+                <div className="field">
+                  <label htmlFor="f-semester">Semester</label>
+                  <select id="f-semester" name="semester" value={form.semester} onChange={handle}>
+                    <option value="">Select Semester</option>
+                    {[...Array(8)].map((_, i) => (
+                      <option key={i + 1} value={i + 1}>Semester {i + 1}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="field">
+                  <label htmlFor="f-project">Project name / topic <span className="sr-only">(optional)</span></label>
+                  <input id="f-project" name="project" value={form.project} onChange={handle} placeholder="If you have one" />
+                </div>
+              </div>
+              <div className="form-row">
+                <div className="field">
+                  <label htmlFor="f-status">Current status</label>
+                  <select id="f-status" name="projectStatus" value={form.projectStatus} onChange={handle}>
+                    <option value="">Current Status</option>
+                    {projectStatusOptions.map((s) => (
+                      <option key={s.value} value={s.value}>{s.label}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="field">
+                  <label htmlFor="f-deadline">Deadline</label>
+                  <input id="f-deadline" name="deadline" type="date" value={form.deadline} onChange={handle} />
+                </div>
+              </div>
+              <div className="field">
+                <label htmlFor="f-message">What help do you need?</label>
+                <textarea id="f-message" name="message" rows={4} value={form.message} onChange={handle} placeholder="Specific requirements, existing issues, etc."></textarea>
+              </div>
+              <button type="submit" className="btn btn-primary btn-block" disabled={submitting}>
+                {submitting ? "Submitting..." : "Submit Request"} {!submitting && <ArrowRight size={16} strokeWidth={2.2} aria-hidden="true" />}
+              </button>
+            </form>
+          ) : (
+            <div className="success-box" role="status">
+              <CheckCircle2 size={32} strokeWidth={1.75} aria-hidden="true" />
+              <h3>Requirement Received!</h3>
+              <p className="success-lead-code">Reference ID: <strong>{leadCode}</strong></p>
+              <p>Our team will review your requirement and reach out on WhatsApp. Quote the reference above if you follow up with us.</p>
+              <button type="button" className="btn btn-secondary" onClick={() => setSubmitted(false)}>Submit Another Request</button>
             </div>
-            <div className="form-row">
-              <input name="email" type="email" placeholder="Email Address *" value={form.email} onChange={handle} required />
-              <select name="branch" value={form.branch} onChange={handle}>
-                {branches.map((b) => (
-                  <option key={b.id} value={b.id}>{b.label}</option>
-                ))}
-              </select>
-            </div>
-            <div className="form-row">
-              <select name="semester" value={form.semester} onChange={handle}>
-                <option value="">Select Semester</option>
-                {[...Array(8)].map((_, i) => (
-                  <option key={i + 1} value={i + 1}>Semester {i + 1}</option>
-                ))}
-              </select>
-              <input name="project" placeholder="Project Name / Topic (if you have one)" value={form.project} onChange={handle} />
-            </div>
-            <div className="form-row">
-              <select name="projectStatus" value={form.projectStatus} onChange={handle}>
-                <option value="">Current Status</option>
-                {projectStatusOptions.map((s) => (
-                  <option key={s.value} value={s.value}>{s.label}</option>
-                ))}
-              </select>
-              <input name="deadline" type="date" placeholder="Deadline" value={form.deadline} onChange={handle} />
-            </div>
-            <textarea name="message" placeholder="Describe what help you need (specific requirements, existing issues, etc.)" rows={4} value={form.message} onChange={handle}></textarea>
-            <button type="submit" className="btn-submit" disabled={submitting}>
-              {submitting ? "Submitting..." : "Submit Request"} {!submitting && <ArrowRight size={16} strokeWidth={2.4} />}
-            </button>
-          </form>
-        ) : (
-          <div className="success-box">
-            <div className="success-icon"><CheckCircle2 size={40} strokeWidth={2} /></div>
-            <h3>Requirement Received!</h3>
-            <p className="success-lead-code">Reference ID: <strong>{leadCode}</strong></p>
-            <p>Our team will review your requirement and reach out on WhatsApp. Quote the reference above if you follow up with us.</p>
-            <button className="btn-primary" onClick={() => setSubmitted(false)}>Submit Another Request</button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </section>
   );
@@ -912,13 +927,13 @@ function Footer() {
       <div className="footer-inner">
         <div className="footer-top">
           <div className="footer-brand-col">
-            <div className="footer-brand">
-              <img src="/logo.png" alt="EngiAssist logo" className="logo-icon-img" />
+            <a href="/" className="footer-brand">
+              <img src="/logo-72.png" width="34" height="34" alt="" className="logo-icon-img" />
               <span>EngiAssist</span>
-            </div>
+            </a>
             <p className="footer-tagline">Empowering every engineering student to build, learn, and succeed.</p>
             <a href="mailto:Contact@Engiassist.in" className="footer-email">
-              <Mail size={14} strokeWidth={2.2} /> Contact@Engiassist.in
+              <Mail size={14} strokeWidth={2} aria-hidden="true" /> Contact@Engiassist.in
             </a>
           </div>
 
@@ -930,7 +945,7 @@ function Footer() {
             <a href="/about">About</a>
             <a href="/#projects">Projects</a>
             <a href="/#contact">Contact</a>
-            <a href="/Engisun">EngiSun Solar ☀</a>
+            <a href="/Engisun">EngiSun (solar division)</a>
           </nav>
 
           <nav className="footer-col" aria-label="By branch">
@@ -993,13 +1008,13 @@ function SeoCta({ heading = "Ready to get started?" }) {
   };
   return (
     <section className="seo-cta">
-      <Reveal className="seo-cta-inner">
+      <div className="container">
         <h2>{heading}</h2>
-        <div className="hero-btns">
-          <button className="btn-primary" onClick={openWhatsApp}><MessageCircle size={16} strokeWidth={2.2} /> Chat on WhatsApp</button>
-          <a className="btn-secondary" href="/#contact">Request This Service ↗</a>
+        <div className="seo-cta-actions">
+          <button type="button" className="btn btn-primary" onClick={openWhatsApp}><MessageCircle size={16} strokeWidth={2} aria-hidden="true" /> Chat on WhatsApp</button>
+          <a className="btn btn-secondary" href="/#contact">Request This Service <ArrowUpRight size={16} aria-hidden="true" /></a>
         </div>
-      </Reveal>
+      </div>
     </section>
   );
 }
@@ -1053,48 +1068,27 @@ function BranchSeoPage({ branchId }) {
 
   return (
     <div className="app">
-      <CursorGlow />
       <Navbar active={active} setActive={setActive} />
-      <section className="about-hero">
-        <div className="hero-bg">
-          <div className="grid-overlay"></div>
-          <div className="orb orb1"></div>
-          <div className="orb orb2"></div>
-        </div>
-        <div className="about-hero-content">
-          <div className="seo-icon-badge" style={{ "--accent": branch.color }}><branch.icon size={30} strokeWidth={2} /></div>
-          <span className="hero-badge"><branch.icon size={15} strokeWidth={2.2} /> {branch.label}</span>
-          <h1 className="about-hero-title">{branch.label} Project Assistance</h1>
-          <p className="hero-sub">{branch.desc}</p>
-        </div>
-      </section>
-      <section className="seo-body">
-        <Reveal className="seo-body-inner">
-          <p>{content.intro}</p>
-        </Reveal>
-      </section>
-      <section className="projects-section" id="projects">
-        <Reveal className="section-header">
-          <span className="section-tag">Popular Topics</span>
-          <h2>{branch.label} Project Ideas</h2>
-          <p>A starting point — we also build custom topics around your requirement</p>
-        </Reveal>
-        <div className="proj-cards" style={{ "--accent": branch.color }}>
-          {branch.projects.map((p, i) => (
-            <div key={p} className="proj-card" style={{ animationDelay: `${i * 0.07}s` }}>
-              <div className="proj-icon-badge"><branch.icon size={22} strokeWidth={2} /></div>
-              <div className="proj-number">0{i + 1}</div>
-              <div className="proj-name">{p}</div>
-              <div className="proj-branch"><branch.icon size={13} strokeWidth={2.2} /> {branch.label}</div>
-              <a className="proj-btn" href="/#contact">Get This Project →</a>
-            </div>
-          ))}
-        </div>
-      </section>
-      <HowItWorks />
-      <FixMyProject />
-      <FAQ />
-      <SeoCta heading={`Need help with your ${branch.label} project?`} />
+      <main id="main" tabIndex={-1}>
+        <PageHero label={branch.label} marker={branch.color} title={`${branch.label} Project Assistance`} sub={branch.desc} />
+        <section className="section">
+          <div className="container">
+            <p className="prose-block">{content.intro}</p>
+          </div>
+        </section>
+        <section className="section section-alt" id="projects" aria-labelledby="branch-topics-title">
+          <div className="container">
+            <SectionHead label="Popular topics" title={`${branch.label} Project Ideas`} titleId="branch-topics-title">
+              A starting point — we also build custom topics around your requirement
+            </SectionHead>
+            <TopicTable branch={branch} />
+          </div>
+        </section>
+        <HowItWorks />
+        <FixMyProject />
+        <FAQ />
+        <SeoCta heading={`Need help with your ${branch.label} project?`} />
+      </main>
       <Footer />
     </div>
   );
@@ -1156,34 +1150,21 @@ function ServiceSeoPage({ slug }) {
 
   return (
     <div className="app">
-      <CursorGlow />
       <Navbar active={active} setActive={setActive} />
-      <section className="about-hero">
-        <div className="hero-bg">
-          <div className="grid-overlay"></div>
-          <div className="orb orb1"></div>
-          <div className="orb orb2"></div>
-        </div>
-        <div className="about-hero-content">
-          <div className="seo-icon-badge"><content.icon size={30} strokeWidth={2} /></div>
-          <span className="hero-badge"><GraduationCap size={15} strokeWidth={2.4} /> Engineering Project Support</span>
-          <h1 className="about-hero-title">{content.heading}</h1>
-          <p className="hero-sub">{content.intro}</p>
-        </div>
-      </section>
-      <section className="fix-section">
-        <Reveal className="fix-wrapper" delay={100}>
-          <div className="fix-chips">
-            {content.items.map((f) => (
-              <span key={f} className="fix-chip">{f}</span>
-            ))}
+      <main id="main" tabIndex={-1}>
+        <PageHero label="Engineering project support" title={content.heading} sub={content.intro} />
+        <section className="section">
+          <div className="container">
+            <ul className="checklist" aria-label={`${content.heading}: what is covered`}>
+              {content.items.map((f) => <li key={f}>{f}</li>)}
+            </ul>
           </div>
-        </Reveal>
-      </section>
-      <Branches />
-      <HowItWorks />
-      <FAQ />
-      <SeoCta heading={`Need help with ${content.heading.toLowerCase()}?`} />
+        </section>
+        <Branches />
+        <HowItWorks />
+        <FAQ />
+        <SeoCta heading={`Need help with ${content.heading.toLowerCase()}?`} />
+      </main>
       <Footer />
     </div>
   );
@@ -1199,36 +1180,38 @@ function FinalYearProjectPage() {
 
   return (
     <div className="app">
-      <CursorGlow />
       <Navbar active={active} setActive={setActive} />
-      <section className="about-hero">
-        <div className="hero-bg">
-          <div className="grid-overlay"></div>
-          <div className="orb orb1"></div>
-          <div className="orb orb2"></div>
-        </div>
-        <div className="about-hero-content">
-          <div className="seo-icon-badge"><GraduationCap size={30} strokeWidth={2} /></div>
-          <span className="hero-badge"><GraduationCap size={15} strokeWidth={2.4} /> Final Year Project Assistance</span>
-          <h1 className="about-hero-title">Final Year Project Help, Start to Submission</h1>
-          <p className="hero-sub">
-            From choosing a topic to building it, documenting it and defending it in your viva —
-            support for B.Tech, BE and Diploma students across every engineering branch.
-          </p>
-        </div>
-      </section>
-      <Branches />
-      <HowItWorks />
-      <Services />
-      <FixMyProject />
-      <FAQ />
-      <SeoCta heading="Ready to start your final year project?" />
+      <main id="main" tabIndex={-1}>
+        <PageHero
+          label="Final year project assistance"
+          title="Final Year Project Help, Start to Submission"
+          sub="From choosing a topic to building it, documenting it and defending it in your viva — support for B.Tech, BE and Diploma students across every engineering branch."
+        />
+        <Branches />
+        <HowItWorks />
+        <Services />
+        <FixMyProject />
+        <FAQ />
+        <SeoCta heading="Ready to start your final year project?" />
+      </main>
       <Footer />
     </div>
   );
 }
 
 function FloatingWhatsApp() {
+  const [tucked, setTucked] = useState(false);
+
+  // On small screens the button steps aside while the request form is visible,
+  // so it never covers the form fields or submit button.
+  useEffect(() => {
+    const el = document.getElementById("contact");
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(([entry]) => setTucked(entry.isIntersecting), { threshold: 0.05 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   const openWhatsApp = () => {
     const message = "Hello EngiAssist! I need help with my engineering project.";
     window.open(`https://wa.me/919021698707?text=${encodeURIComponent(message)}`, "_blank");
@@ -1236,60 +1219,32 @@ function FloatingWhatsApp() {
 
   return (
     <button
+      type="button"
       onClick={openWhatsApp}
       aria-label="Chat with us on WhatsApp"
       title="Chat with us on WhatsApp"
-      style={{
-        position: "fixed",
-        right: "24px",
-        bottom: "24px",
-        width: "60px",
-        height: "60px",
-        borderRadius: "50%",
-        border: "none",
-        background: "#25D366",
-        color: "white",
-        fontSize: "30px",
-        cursor: "pointer",
-        zIndex: 9999,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        boxShadow: "0 6px 20px rgba(0, 0, 0, 0.3)",
-        transition: "transform 0.2s ease",
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "scale(1.1)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = "scale(1)";
-      }}
+      className={`wa-fab ${tucked ? "is-tucked" : ""}`}
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        width="32"
-        height="32"
-        fill="white"
-        aria-hidden="true"
-      >
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
         <path d="M20.52 3.449A11.86 11.86 0 0 0 12.05 0C5.495 0 .163 5.332.163 11.89c0 2.096.548 4.142 1.588 5.946L0 24l6.335-1.655a11.88 11.88 0 0 0 5.709 1.447h.005c6.554 0 11.887-5.332 11.887-11.89a11.85 11.85 0 0 0-3.416-8.453zM12.05 21.79h-.004a9.87 9.87 0 0 1-5.032-1.378l-.361-.214-3.76.982 1.004-3.67-.235-.375a9.87 9.87 0 0 1-1.51-5.245c0-5.442 4.43-9.872 9.877-9.872a9.83 9.83 0 0 1 6.994 2.9 9.83 9.83 0 0 1 2.894 6.994c-.003 5.445-4.433 9.878-9.867 9.878zm5.413-7.397c-.297-.149-1.758-.867-2.03-.967-.273-.099-.472-.148-.67.149-.198.297-.767.966-.94 1.164-.173.198-.347.223-.644.075-.297-.149-1.256-.463-2.39-1.475-.883-.788-1.48-1.762-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.173.198-.298.298-.496.099-.198.05-.372-.025-.521-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.501-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.075-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
       </svg>
     </button>
   );
 }
 
+// EngiSun is a separate solar business — visually distinct from the student-project flow.
 function SolarPromo() {
   return (
-    <section className="solar-promo" id="engisun">
-      <div className="solar-promo-inner">
-        <div className="solar-sun" aria-hidden="true"><span></span></div>
-        <div className="solar-copy">
-          <span className="solar-tag">☀ New from EngiAssist</span>
-          <h2>Introducing <span className="solar-grad">EngiSun</span></h2>
+    <section className="solar-band" id="engisun" aria-labelledby="engisun-title">
+      <div className="container solar-inner">
+        <div className="solar-mark" aria-hidden="true"><Sun size={40} strokeWidth={1.5} /></div>
+        <div>
+          <p className="label">EngiSun · Solar division</p>
+          <h2 id="engisun-title">Introducing <span>EngiSun</span></h2>
           <p>Our solar division — DCR &amp; non-DCR rooftop installation for homes and businesses, with subsidy guidance and net metering support.</p>
+          <p className="solar-note">Separate from student project support.</p>
         </div>
-        <a href="/Engisun" className="solar-cta">Explore EngiSun <ArrowRight size={18} strokeWidth={2.4} /></a>
+        <a href="/Engisun" className="btn btn-solar">Explore EngiSun <ArrowRight size={16} strokeWidth={2.2} aria-hidden="true" /></a>
       </div>
     </section>
   );
@@ -1300,18 +1255,19 @@ function Landing() {
 
   return (
     <div className="app">
-      <CursorGlow />
       <Navbar active={active} setActive={setActive} />
-      <Hero />
-      <Branches />
-      <HowItWorks />
-      <Services />
-      <SolarPromo />
-      <FixMyProject />
-      <Testimonials />
-      <Projects />
-      <FAQ />
-      <Contact />
+      <main id="main" tabIndex={-1}>
+        <Hero />
+        <Branches n="01" />
+        <Services n="02" />
+        <HowItWorks n="03" />
+        <Projects n="04" />
+        <FixMyProject n="05" />
+        <Testimonials n="06" />
+        <FAQ n="07" />
+        <Contact n="08" />
+        <SolarPromo />
+      </main>
       <Footer />
       <FloatingWhatsApp />
     </div>
@@ -1458,11 +1414,11 @@ function LegalPage({ slug }) {
   return (
     <div className="app">
       <Navbar active={null} setActive={() => {}} />
-      <div className="legal-page">
+      <main id="main" tabIndex={-1} className="legal-page">
         <h1>{content.heading}</h1>
         <p className="legal-updated">Last updated: September 2026</p>
         {content.body}
-      </div>
+      </main>
       <Footer />
     </div>
   );
